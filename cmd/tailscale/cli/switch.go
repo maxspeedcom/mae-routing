@@ -21,11 +21,11 @@ import (
 var switchCmd = &ffcli.Command{
 	Name: "switch",
 	ShortUsage: strings.Join([]string{
-		"tailscale switch <id>",
-		"tailscale switch --list [--json]",
+		"mae-routing switch <id>",
+		"mae-routing switch --list [--json]",
 	}, "\n"),
-	ShortHelp: "Switch to a different Tailscale account",
-	LongHelp: `"tailscale switch" switches between logged in accounts. You can
+	ShortHelp: "Switch to a different MAE Routing account",
+	LongHelp: `"mae-routing switch" switches between logged in accounts. You can
 use the ID that's returned from 'tailnet switch -list'
 to pick which profile you want to switch to. Alternatively, you
 can use the Tailnet, account names, or display names to switch as well.
@@ -44,9 +44,9 @@ This command is currently in alpha and may change in the future.`,
 	Subcommands: []*ffcli.Command{
 		{
 			Name:       "remove",
-			ShortUsage: "tailscale switch remove <id>",
-			ShortHelp:  "Remove a Tailscale account",
-			LongHelp: `"tailscale switch remove" removes a Tailscale account from the
+			ShortUsage: "mae-routing switch remove <id>",
+			ShortHelp:  "Remove a MAE Routing account",
+			LongHelp: `"mae-routing switch remove" removes a MAE Routing account from the
 local machine. This does not delete the account itself, but
 it will no longer be available for switching to. You can
 add it back by logging in again.
@@ -154,11 +154,11 @@ func switchProfile(ctx context.Context, args []string) error {
 		return listProfiles(ctx)
 	}
 	if switchArgs.json {
-		outln("--json argument cannot be used with tailscale switch NAME")
+		outln("--json argument cannot be used with mae-routing switch NAME")
 		os.Exit(1)
 	}
 	if len(args) != 1 {
-		outln("usage: tailscale switch NAME")
+		outln("usage: mae-routing switch NAME")
 		os.Exit(1)
 	}
 	cp, all, err := localClient.ProfileStatus(ctx)
@@ -201,7 +201,7 @@ func switchProfile(ctx context.Context, args []string) error {
 		case "NeedsLogin":
 			outln("Logged out.")
 			outln("To log in, run:")
-			outln("  tailscale up")
+			outln("  mae-routing up")
 			return nil
 		case "Running":
 			outln("Success.")
@@ -217,7 +217,7 @@ func switchProfile(ctx context.Context, args []string) error {
 
 func removeProfile(ctx context.Context, args []string) error {
 	if len(args) != 1 {
-		outln("usage: tailscale switch remove NAME")
+		outln("usage: mae-routing switch remove NAME")
 		os.Exit(1)
 	}
 	cp, all, err := localClient.ProfileStatus(ctx)

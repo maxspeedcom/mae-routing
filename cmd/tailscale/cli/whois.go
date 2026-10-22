@@ -21,10 +21,10 @@ import (
 
 var whoisCmd = &ffcli.Command{
 	Name:       "whois",
-	ShortUsage: "tailscale whois [--json] ip[:port]",
-	ShortHelp:  "Show the machine and user associated with a Tailscale IP (v4 or v6)",
+	ShortUsage: "mae-routing whois [--json] ip[:port]",
+	ShortHelp:  "Show the machine and user associated with a MAE Routing IP (v4 or v6)",
 	LongHelp: strings.TrimSpace(`
-	'tailscale whois' shows the machine and user associated with a Tailscale IP (v4 or v6).
+	'mae-routing whois' shows the machine and user associated with a MAE Routing IP (v4 or v6).
 	`),
 	Exec: runWhoIs,
 	FlagSet: func() *flag.FlagSet {

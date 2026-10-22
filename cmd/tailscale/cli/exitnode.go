@@ -26,12 +26,12 @@ import (
 func exitNodeCmd() *ffcli.Command {
 	return &ffcli.Command{
 		Name:       "exit-node",
-		ShortUsage: "tailscale exit-node [flags]",
+		ShortUsage: "mae-routing exit-node [flags]",
 		ShortHelp:  "Show machines on your tailnet configured as exit nodes",
 		Subcommands: append([]*ffcli.Command{
 			{
 				Name:       "list",
-				ShortUsage: "tailscale exit-node list [flags]",
+				ShortUsage: "mae-routing exit-node list [flags]",
 				ShortHelp:  "Show exit nodes",
 				Exec:       runExitNodeList,
 				FlagSet: (func() *flag.FlagSet {
@@ -42,7 +42,7 @@ func exitNodeCmd() *ffcli.Command {
 			},
 			{
 				Name:       "suggest",
-				ShortUsage: "tailscale exit-node suggest",
+				ShortUsage: "mae-routing exit-node suggest",
 				ShortHelp:  "Suggest the best available exit node",
 				Exec:       runExitNodeSuggest,
 				FlagSet: (func() *flag.FlagSet {
@@ -60,13 +60,13 @@ func exitNodeCmd() *ffcli.Command {
 				return []*ffcli.Command{
 					{
 						Name:       "connect",
-						ShortUsage: "tailscale exit-node connect",
+						ShortUsage: "mae-routing exit-node connect",
 						ShortHelp:  "Connect to most recently used exit node",
 						Exec:       exitNodeSetUse(true),
 					},
 					{
 						Name:       "disconnect",
-						ShortUsage: "tailscale exit-node disconnect",
+						ShortUsage: "mae-routing exit-node disconnect",
 						ShortHelp:  "Disconnect from current exit node, if any",
 						Exec:       exitNodeSetUse(false),
 					},
@@ -108,7 +108,7 @@ func exitNodeSetUse(wantOn bool) func(ctx context.Context, args []string) error 
 // For countries without location data, each exit node is displayed.
 func runExitNodeList(ctx context.Context, args []string) error {
 	if len(args) > 0 {
-		return errors.New("unexpected non-flag arguments to 'tailscale exit-node list'")
+		return errors.New("unexpected non-flag arguments to 'mae-routing exit-node list'")
 	}
 	getStatus := localClient.Status
 	st, err := getStatus(ctx)
@@ -147,10 +147,10 @@ func runExitNodeList(ctx context.Context, args []string) error {
 	}
 	fmt.Fprintln(w)
 	fmt.Fprintln(w)
-	fmt.Fprintln(w, "# To view the complete list of exit nodes for a country, use `tailscale exit-node list --filter=` followed by the country name.")
-	fmt.Fprintln(w, "# To use an exit node, use `tailscale set --exit-node=` followed by the IP or hostname.")
+	fmt.Fprintln(w, "# To view the complete list of exit nodes for a country, use `mae-routing exit-node list --filter=` followed by the country name.")
+	fmt.Fprintln(w, "# To use an exit node, use `mae-routing set --exit-node=` followed by the IP or hostname.")
 	if hasAnyExitNodeSuggestions(peers) {
-		fmt.Fprintln(w, "# To have Tailscale suggest an exit node, use `tailscale exit-node suggest`.")
+		fmt.Fprintln(w, "# To have MAE Routing suggest an exit node, use `mae-routing exit-node suggest`.")
 	}
 	return nil
 }
@@ -170,7 +170,7 @@ func runExitNodeSuggest(ctx context.Context, args []string) error {
 		fmt.Println("No exit node suggestion is available.")
 		return nil
 	}
-	fmt.Printf("Suggested exit node: %v\nTo accept this suggestion, use `tailscale set --exit-node=%v`.\n", res.Name, shellquote.Join(res.Name))
+	fmt.Printf("Suggested exit node: %v\nTo accept this suggestion, use `mae-routing set --exit-node=%v`.\n", res.Name, shellquote.Join(res.Name))
 	return nil
 }
 

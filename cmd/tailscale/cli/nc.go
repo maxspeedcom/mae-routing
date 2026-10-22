@@ -18,7 +18,7 @@ import (
 
 var ncCmd = &ffcli.Command{
 	Name:       "nc",
-	ShortUsage: "tailscale nc <hostname-or-IP> <port>",
+	ShortUsage: "mae-routing nc <hostname-or-IP> <port>",
 	ShortHelp:  "Connect to a port on a host, connected to stdin/stdout",
 	Exec:       runNC,
 }
@@ -56,7 +56,7 @@ func runNC(ctx context.Context, args []string) error {
 	}
 
 	if len(args) != 2 {
-		return errors.New("usage: tailscale nc <hostname-or-IP> <port>")
+		return errors.New("usage: mae-routing nc <hostname-or-IP> <port>")
 	}
 
 	hostOrIP, portStr := args[0], args[1]

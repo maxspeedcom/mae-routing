@@ -241,7 +241,7 @@ func (service *ipnService) Execute(args []string, r <-chan svc.ChangeRequest, ch
 				handleSessionChange(cmd)
 				changes <- cmd.CurrentStatus
 			case cmdUninstallWinTun:
-				syslogf("Stopping tailscaled child process and uninstalling WinTun")
+				syslogf("Stopping mae-routingd child process and uninstalling WinTun")
 				// At this point, doneCh is the channel which will be closed when the
 				// tailscaled subprocess exits. We save that to childDoneCh.
 				childDoneCh := doneCh
@@ -370,7 +370,7 @@ func beFirewallKillswitch() bool {
 	}
 
 	log.SetFlags(0)
-	log.Printf("killswitch subprocess starting, tailscale GUID is %s", os.Args[2])
+	log.Printf("killswitch subprocess starting, mae-routing GUID is %s", os.Args[2])
 
 	guid, err := windows.GUIDFromString(os.Args[2])
 	if err != nil {

@@ -20,14 +20,14 @@ import (
 
 var getCmd = &ffcli.Command{
 	Name:       "get",
-	ShortUsage: "tailscale get [flags] [setting-name | all]",
+	ShortUsage: "mae-routing get [flags] [setting-name | all]",
 	ShortHelp:  "Show current preference values",
-	LongHelp: `"tailscale get" shows the current value of one or all preferences.
+	LongHelp: `"mae-routing get" shows the current value of one or all preferences.
 
 With no argument or "all", all preferences are shown.
 With a specific setting name, only that value is shown.
 
-The setting names are the same flag names accepted by "tailscale set".`,
+The setting names are the same flag names accepted by "mae-routing set".`,
 	FlagSet: getFlags,
 	Exec:    runGet,
 }
@@ -44,7 +44,7 @@ var getFlags = newGetFlagSet(&getArgs)
 func newGetFlagSet(args *getArgsT) *flag.FlagSet {
 	fs := newFlagSet("get")
 	fs.BoolVar(&args.json, "json", false, "output as JSON")
-	fs.BoolVar(&args.setFlags, "set-flags", false, "output as \"tailscale set\" flag arguments")
+	fs.BoolVar(&args.setFlags, "set-flags", false, "output as \"mae-routing set\" flag arguments")
 	return fs
 }
 
@@ -100,7 +100,7 @@ func selectSettings(prefs *ipn.Prefs, st *ipnstate.Status, goos string, args []s
 			return []getSetting{s}, false, nil
 		}
 	}
-	return nil, false, fmt.Errorf("unknown setting %q; see \"tailscale set --help\" for valid settings", wantName)
+	return nil, false, fmt.Errorf("unknown setting %q; see \"mae-routing set --help\" for valid settings", wantName)
 }
 
 // getSettingsFromPrefs returns get-able settings derived from prefs,

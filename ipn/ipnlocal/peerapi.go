@@ -459,7 +459,7 @@ func (h *peerAPIHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <body>
 <h1>Hello, %s (%v)</h1>
-This is my Tailscale device. Your device is %v.
+This is my MAE Routing device. Your device is %v.
 `, html.EscapeString(who), h.remoteAddr.Addr(), html.EscapeString(h.peerNode.ComputedName()))
 
 	if h.isSelf {

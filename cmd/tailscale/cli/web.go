@@ -34,15 +34,15 @@ func init() {
 func webCmd() *ffcli.Command {
 	return &ffcli.Command{
 		Name:       "web",
-		ShortUsage: "tailscale web [flags]",
-		ShortHelp:  "Run a web server for controlling Tailscale",
+		ShortUsage: "mae-routing web [flags]",
+		ShortHelp:  "Run a web server for controlling MAE Routing",
 
 		LongHelp: strings.TrimSpace(`
-"tailscale web" runs a webserver for controlling the Tailscale daemon.
+"mae-routing web" runs a webserver for controlling the MAE Routing daemon.
 
 It's primarily intended for use on Synology, QNAP, and other
 NAS devices where a web interface is the natural place to control
-Tailscale, as opposed to a CLI or a native app.
+MAE Routing, as opposed to a CLI or a native app.
 `),
 
 		FlagSet: (func() *flag.FlagSet {
@@ -110,9 +110,9 @@ func runWeb(ctx context.Context, args []string) error {
 	var startedManagementClient bool // we started the management client
 	if !existingWebClient && !webArgs.readonly {
 		// Also start full client in tailscaled.
-		log.Printf("starting tailscaled web client at http://%s\n", netip.AddrPortFrom(selfIP, tsconst.WebListenPort))
+		log.Printf("starting mae-routingd web client at http://%s\n", netip.AddrPortFrom(selfIP, tsconst.WebListenPort))
 		if err := setRunWebClient(ctx, true); err != nil {
-			return fmt.Errorf("starting web client in tailscaled: %w", err)
+			return fmt.Errorf("starting web client in mae-routingd: %w", err)
 		}
 		startedManagementClient = true
 	}
@@ -140,11 +140,11 @@ func runWeb(ctx context.Context, args []string) error {
 			// Shutdown the server.
 			webServer.Shutdown()
 			if !webArgs.cgi && startedManagementClient {
-				log.Println("stopping tailscaled web client")
+				log.Println("stopping mae-routingd web client")
 				// When not in cgi mode, shut down the tailscaled
 				// web client on cli termination if we started it.
 				if err := setRunWebClient(context.Background(), false); err != nil {
-					log.Printf("stopping tailscaled web client: %v", err)
+					log.Printf("stopping mae-routingd web client: %v", err)
 				}
 			}
 		}

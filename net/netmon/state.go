@@ -576,7 +576,7 @@ func isTailscaleInterface(name string, ips []netip.Prefix) bool {
 	}
 
 	// Windows, Linux...
-	return name == "Tailscale" || // as it is on Windows
+	return name == "Tailscale" || name == "MAE Routing" || strings.HasPrefix(name, "maerouting") || // as it is on Windows
 		strings.HasPrefix(name, "tailscale") // TODO: use --tun flag value, etc; see TODO in method doc
 }
 

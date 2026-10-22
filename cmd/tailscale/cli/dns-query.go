@@ -25,12 +25,12 @@ var dnsQueryArgs struct {
 
 var dnsQueryCmd = &ffcli.Command{
 	Name:       "query",
-	ShortUsage: "tailscale dns query [--json] <name> [type]",
+	ShortUsage: "mae-routing dns query [--json] <name> [type]",
 	Exec:       runDNSQuery,
 	ShortHelp:  "Perform a DNS query",
 	LongHelp: strings.TrimSpace(`
-The 'tailscale dns query' subcommand performs a DNS query for the specified name
-using the internal DNS forwarder (100.100.100.100).
+The 'mae-routing dns query' subcommand performs a DNS query for the specified name
+using the internal DNS forwarder (10.77.77.77).
 
 By default, the DNS query will request an A record. Specify the record type as
 a second argument after the name (e.g. AAAA, CNAME, MX, NS, PTR, SRV, TXT).
@@ -57,7 +57,7 @@ func runDNSQuery(ctx context.Context, args []string) error {
 			}
 		}
 		if len(flags) > 0 {
-			return fmt.Errorf("unexpected flags after query name: %s; see 'tailscale dns query --help'", strings.Join(flags, ", "))
+			return fmt.Errorf("unexpected flags after query name: %s; see 'mae-routing dns query --help'", strings.Join(flags, ", "))
 		}
 		if len(args) > 2 {
 			return fmt.Errorf("unexpected extra arguments: %s", strings.Join(args[2:], " "))

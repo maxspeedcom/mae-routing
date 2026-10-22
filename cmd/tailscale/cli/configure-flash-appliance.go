@@ -40,11 +40,11 @@ var flashApplianceArgs struct {
 func flashApplianceCmd() *ffcli.Command {
 	return &ffcli.Command{
 		Name:       "flash-appliance",
-		ShortUsage: "tailscale configure flash-appliance [flags]",
-		ShortHelp:  "Download a signed Tailscale appliance image and write it to a local disk [experimental]",
+		ShortUsage: "mae-routing configure flash-appliance [flags]",
+		ShortHelp:  "Download a signed MAE Routing appliance image and write it to a local disk [experimental]",
 		LongHelp: hidden + strings.TrimSpace(`
-This experimental command downloads a signed Tailscale appliance image (Gokrazy archive
-format, "GAF") from pkgs.tailscale.com, verifies its signature, and writes
+This experimental command downloads a signed MAE Routing appliance image (Gokrazy archive
+format, "GAF") from the upstream package server, verifies its signature, and writes
 it to a local block device (SD card, USB drive, virtual disk).
 
 On macOS, the target disk is auto-discovered from 'diskutil list physical',

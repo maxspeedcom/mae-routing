@@ -583,12 +583,12 @@ func NewLocalBackend(logf logger.Logf, logID logid.PublicID, sys *tsd.System, lo
 			sys.UserMetricsRegistry(),
 			"tailscaled_serve_inbound_bytes_total",
 			"counter",
-			"Bytes received from peers on Serve connections for Tailscale Services, labeled by Tailscale Service name."),
+			"Bytes received from peers on Serve connections for MAE Routing Services, labeled by MAE Routing Service name."),
 		serveBytesOutbound: usermetric.NewMultiLabelMapWithRegistry[serveLabels](
 			sys.UserMetricsRegistry(),
 			"tailscaled_serve_outbound_bytes_total",
 			"counter",
-			"Bytes sent to peers on Serve connections for Tailscale Services, labeled by Tailscale Service name."),
+			"Bytes sent to peers on Serve connections for MAE Routing Services, labeled by MAE Routing Service name."),
 	}
 
 	b := &LocalBackend{
@@ -2046,7 +2046,7 @@ func (b *LocalBackend) setControlClientStatusLocked(c controlclient.Client, st c
 	// Now complete the lock-free parts of what we started while locked.
 	if st.NetMap != nil {
 		if envknob.NoLogsNoSupport() && st.NetMap.HasCap(nodecap.DataPlaneAuditLogs) {
-			msg := "tailnet requires logging to be enabled. Remove --no-logs-no-support from tailscaled command line."
+			msg := "tailnet requires logging to be enabled. Remove --no-logs-no-support from mae-routingd command line."
 			b.health.SetLocalLogConfigHealth(errors.New(msg))
 			// Get the current prefs again, since we unlocked above.
 			prefs := b.pm.CurrentPrefs().AsStruct()
@@ -4653,7 +4653,7 @@ func (b *LocalBackend) CheckIPNConnectionAllowed(actor ipnauth.Actor) error {
 	} else {
 		reason = "already in use"
 	}
-	return fmt.Errorf("Tailscale %s (%q); connection from %q not allowed",
+	return fmt.Errorf("MAE Routing %s (%q); connection from %q not allowed",
 		reason, b.tryLookupUserName(string(b.pm.CurrentUserID())),
 		b.tryLookupUserName(string(uid)))
 }
@@ -4765,7 +4765,7 @@ func (b *LocalBackend) pingPeerAPI(ctx context.Context, ip netip.Addr) (peer tai
 		peer, ok = cn.PeerByID(nid)
 	}
 	if !ok {
-		return zero, "", fmt.Errorf("no peer found with Tailscale IP %v", ip)
+		return zero, "", fmt.Errorf("no peer found with MAE Routing IP %v", ip)
 	}
 	if peer.Expired() {
 		return zero, "", errors.New("peer's node key has expired")
@@ -4896,7 +4896,7 @@ func (b *LocalBackend) switchToBestProfileLocked(reason string) {
 			b.logf("%s: staying on profile %q (%s)", reason, cp.UserProfile().LoginName(), cp.ID())
 		}
 	case cp.ID() == "":
-		b.logf("%s: disconnecting Tailscale", reason)
+		b.logf("%s: disconnecting MAE Routing", reason)
 	case background:
 		b.logf("%s: switching to background profile %q (%s)", reason, cp.UserProfile().LoginName(), cp.ID())
 	default:
@@ -4995,7 +4995,7 @@ func (b *LocalBackend) isConfigLocked_Locked() bool {
 
 func (b *LocalBackend) checkPrefsLocked(p *ipn.Prefs) error {
 	if b.isConfigLocked_Locked() {
-		return errors.New("can't reconfigure tailscaled when using a config file; config file is locked")
+		return errors.New("can't reconfigure mae-routingd when using a config file; config file is locked")
 	}
 	var errs []error
 	if p.Hostname == "badhostname.tailscale." {
@@ -5039,9 +5039,9 @@ func (b *LocalBackend) checkSSHPrefsLocked(p *ipn.Prefs) error {
 	// Assume that we do have the SSH capability if don't have a netmap yet.
 	if !b.currentNode().SelfHasCapOr(nodecap.SSH, true) {
 		if b.isDefaultServerLocked() {
-			return errors.New("Unable to enable local Tailscale SSH server; not enabled on Tailnet. See https://tailscale.com/s/ssh")
+			return errors.New("Unable to enable local MAE Routing SSH server; not enabled on Tailnet. See https://routing.maesuaisystem.com/")
 		}
-		return errors.New("Unable to enable local Tailscale SSH server; not enabled on Tailnet.")
+		return errors.New("Unable to enable local MAE Routing SSH server; not enabled on Tailnet.")
 	}
 	return nil
 }
@@ -5068,7 +5068,7 @@ func (b *LocalBackend) sshOnButUnusableHealthCheckMessageLocked() (healthMessage
 	if !isDefault {
 		return healthmsg.TailscaleSSHOnBut + "access controls don't allow anyone to access this device. Update your tailnet's ACLs to allow access."
 	}
-	return healthmsg.TailscaleSSHOnBut + "access controls don't allow anyone to access this device. Update your tailnet's ACLs at https://tailscale.com/s/ssh-policy"
+	return healthmsg.TailscaleSSHOnBut + "access controls don't allow anyone to access this device. Update your tailnet's ACLs at https://routing.maesuaisystem.com/"
 }
 
 func (b *LocalBackend) isDefaultServerLocked() bool {
@@ -5228,7 +5228,7 @@ func (b *LocalBackend) checkEditPrefsAccessLocked(actor ipnauth.Actor, prefs ipn
 	var errs []error
 
 	if mp.RunSSHSet && mp.RunSSH && !envknob.CanSSHD() {
-		errs = append(errs, errors.New("Tailscale SSH server administratively disabled"))
+		errs = append(errs, errors.New("MAE Routing SSH server administratively disabled"))
 	}
 
 	// Check if the user is allowed to disconnect Tailscale.
@@ -6509,7 +6509,7 @@ func (b *LocalBackend) initPeerAPIListenerLocked() {
 				}
 				// Sandboxed macOS specifically requires the interface index to be non-zero.
 				if version.IsSandboxedMacOS() && tsIfIndex == 0 {
-					b.logf("[v1] peerapi listen(%q) error: interface index is 0 on darwin; try restarting tailscaled", a.Addr())
+					b.logf("[v1] peerapi listen(%q) error: interface index is 0 on darwin; try restarting mae-routingd", a.Addr())
 					continue
 				}
 				b.logf("[unexpected] peerapi listen(%q) error: %v", a.Addr(), err)
@@ -6857,7 +6857,7 @@ func (b *LocalBackend) enterStateLocked(newState ipn.State) {
 		}
 
 		if newState == ipn.Stopped && authURL == "" {
-			feature.SystemdStatus("Stopped; run 'tailscale up' to log in")
+			feature.SystemdStatus("Stopped; run 'mae-routing up' to log in")
 		}
 	case ipn.Starting, ipn.NeedsMachineAuth:
 		b.authReconfigLocked()
@@ -7806,7 +7806,7 @@ func (b *LocalBackend) SetUDPGROForwarding() error {
 	}
 	netmonSys, ok := b.sys.NetMon.GetOK()
 	if !ok {
-		return errors.New("[unexpected] unable to retrieve tailscale netmon configuration")
+		return errors.New("[unexpected] unable to retrieve mae-routing netmon configuration")
 	}
 	state := netmonSys.InterfaceState()
 	if state == nil {
@@ -8206,16 +8206,16 @@ func (b *LocalBackend) sshServerOrInit() (_ SSHServer, err error) {
 
 var warnSyncDisabled = health.Register(&health.Warnable{
 	Code:     "sync-disabled",
-	Title:    "Tailscale Sync is Disabled",
+	Title:    "MAE Routing Sync is Disabled",
 	Severity: health.SeverityHigh,
-	Text:     health.StaticMessage("Tailscale control plane syncing is disabled; run `tailscale set --sync` to restore"),
+	Text:     health.StaticMessage("MAE Routing control plane syncing is disabled; run `mae-routing set --sync` to restore"),
 })
 
 var warnSSHSELinuxWarnable = health.Register(&health.Warnable{
 	Code:     "ssh-unavailable-selinux-enabled",
-	Title:    "Tailscale SSH and SELinux",
+	Title:    "MAE Routing SSH and SELinux",
 	Severity: health.SeverityLow,
-	Text:     health.StaticMessage("SELinux is enabled; Tailscale SSH may not work. See https://tailscale.com/s/ssh-selinux"),
+	Text:     health.StaticMessage("SELinux is enabled; MAE Routing SSH may not work. See https://routing.maesuaisystem.com/"),
 })
 
 // warnNoSNATWithExitNode is a warnable for when a node is advertising as an
@@ -8520,7 +8520,7 @@ func (b *LocalBackend) GetPeerEndpointChanges(ctx context.Context, ip netip.Addr
 		return nil, fmt.Errorf("no matching peer")
 	}
 	if pip.IsSelf {
-		return nil, fmt.Errorf("%v is local Tailscale IP", ip)
+		return nil, fmt.Errorf("%v is local MAE Routing IP", ip)
 	}
 	peer := pip.Node
 

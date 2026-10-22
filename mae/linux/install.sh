@@ -10,16 +10,16 @@
 #   --hostname NAME         device name in the network
 #   --advertise-routes LIST e.g. 192.168.1.0/24 (subnet router)
 #   --advertise-exit-node   offer this machine as an exit node
-#   --force                 install even if Tailscale is running here (they cannot run at the same time)
 #   --uninstall [--purge]   remove MAE Routing (--purge also deletes this machine's keys)
 #
 # Works on any Linux with systemd or OpenRC: Debian, Ubuntu, RHEL/Rocky/Alma, Fedora, Arch, SUSE, Alpine,
 # Raspberry Pi OS, Proxmox. CPU: x86_64, arm64, armv7, i386.
+# Runs next to other mesh VPN clients: MAE Routing uses 10.77.0.0/16, UDP 41642, route table 77, chains mr-*.
 set -eu
 
 VERSION="__VERSION__"
-BASE="https://routing.maesuaisystem.com/download/linux"
-ORG="" AUTHKEY="" HOSTNAME_ARG="" ROUTES="" EXITNODE="" FORCE="" UNINSTALL="" PURGE=""
+BASE="${MAE_ROUTING_BASE:-https://routing.maesuaisystem.com/download/linux}"
+ORG="" AUTHKEY="" HOSTNAME_ARG="" ROUTES="" EXITNODE="" UNINSTALL="" PURGE=""
 
 say() { printf '%s\n' "$*"; }
 die() { printf 'mae-routing install: %s\n' "$*" >&2; exit 1; }
@@ -35,7 +35,7 @@ while [ $# -gt 0 ]; do
 		--advertise-routes) ROUTES="${2:-}"; shift ;;
 		--advertise-routes=*) ROUTES="${1#*=}" ;;
 		--advertise-exit-node) EXITNODE=1 ;;
-		--force) FORCE=1 ;;
+		--force) ;;   # accepted for compatibility
 		--uninstall) UNINSTALL=1 ;;
 		--purge) PURGE=1 ;;
 		-h|--help) sed -n '2,20p' "$0" 2>/dev/null || true; exit 0 ;;
@@ -96,10 +96,6 @@ case "$(uname -m)" in
 	*) die "unsupported CPU $(uname -m); supported: x86_64, arm64, armv7, i386" ;;
 esac
 
-if [ -z "$FORCE" ] && { pgrep -x tailscaled >/dev/null 2>&1 || { [ "$INIT" = systemd ] && systemctl is-active --quiet tailscaled 2>/dev/null; }; }; then
-	die "Tailscale is running on this machine. MAE Routing and Tailscale use the same addresses (100.64.0.0/10)
-and cannot run at the same time. Stop it first (systemctl disable --now tailscaled) or re-run with --force."
-fi
 
 fetch() { # url dest
 	if command -v curl >/dev/null 2>&1; then curl -fsSL --retry 3 -o "$2" "$1"

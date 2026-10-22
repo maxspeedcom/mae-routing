@@ -36,7 +36,7 @@ func init() {
 			Name:       "cert",
 			Exec:       runCert,
 			ShortHelp:  "Get TLS certs",
-			ShortUsage: "tailscale cert [flags] <domain>",
+			ShortUsage: "mae-routing cert [flags] <domain>",
 			FlagSet: (func() *flag.FlagSet {
 				fs := newFlagSet("cert")
 				fs.StringVar(&certArgs.certFile, "cert-file", "", "output cert file or \"-\" for stdout; defaults to DOMAIN.crt if --cert-file and --key-file are both unset")
@@ -70,7 +70,7 @@ func runCert(ctx context.Context, args []string) error {
 						return
 					}
 				}
-				fmt.Fprintf(w, "<h1>Hello from Tailscale</h1>It works.")
+				fmt.Fprintf(w, "<h1>Hello from MAE Routing</h1>It works.")
 			}),
 		}
 		switch len(args) {
@@ -99,7 +99,7 @@ func runCert(ctx context.Context, args []string) error {
 				fmt.Fprintf(&hint, "\nValid domain options: %q.\n", st.CertDomains)
 			}
 		}
-		return fmt.Errorf("Usage: tailscale cert [flags] <domain>%s", hint.Bytes())
+		return fmt.Errorf("Usage: mae-routing cert [flags] <domain>%s", hint.Bytes())
 	}
 	domain := args[0]
 

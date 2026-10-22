@@ -20,18 +20,18 @@ import (
 
 var dnsStatusCmd = &ffcli.Command{
 	Name:       "status",
-	ShortUsage: "tailscale dns status [--all] [--json]",
+	ShortUsage: "mae-routing dns status [--all] [--json]",
 	Exec:       runDNSStatus,
 	ShortHelp:  "Print the current DNS status and configuration",
 	LongHelp: strings.TrimSpace(`
-The 'tailscale dns status' subcommand prints the current DNS status and
+The 'mae-routing dns status' subcommand prints the current DNS status and
 configuration, including:
 
 - Whether the built-in DNS forwarder is enabled.
 
 - The MagicDNS configuration provided by the coordination server.
 
-- Details on which resolver(s) Tailscale believes the system is using by
+- Details on which resolver(s) MAE Routing believes the system is using by
   default.
 
 The --all flag can be used to output advanced debugging information, including
@@ -68,8 +68,8 @@ and includes the following components:
 - Exit Node Filtered Set: DNS suffixes that the node, when acting as an exit
   node DNS proxy, will not answer.
 
-For more information about the DNS functionality built into Tailscale, refer to
-https://tailscale.com/kb/1054/dns.
+For more information about the DNS functionality built into MAE Routing, refer to
+https://routing.maesuaisystem.com/
 `),
 	FlagSet: (func() *flag.FlagSet {
 		fs := newFlagSet("status")
@@ -194,9 +194,9 @@ func formatDNSStatusText(data *tsdnsjsonv0.StatusResponse, all bool) string {
 	fmt.Fprintf(&sb, "=== 'Use Tailscale DNS' status ===\n")
 	fmt.Fprintf(&sb, "\n")
 	if data.TailscaleDNS {
-		fmt.Fprintf(&sb, "Tailscale DNS: enabled.\n\nTailscale is configured to handle DNS queries on this device.\nRun 'tailscale set --accept-dns=false' to revert to your system default DNS resolver.\n")
+		fmt.Fprintf(&sb, "MAE Routing DNS: enabled.\n\nTailscale is configured to handle DNS queries on this device.\nRun 'mae-routing set --accept-dns=false' to revert to your system default DNS resolver.\n")
 	} else {
-		fmt.Fprintf(&sb, "Tailscale DNS: disabled.\n\n(Run 'tailscale set --accept-dns=true' to start sending DNS queries to the Tailscale DNS resolver)\n")
+		fmt.Fprintf(&sb, "MAE Routing DNS: disabled.\n\n(Run 'mae-routing set --accept-dns=true' to start sending DNS queries to the MAE Routing DNS resolver)\n")
 	}
 	fmt.Fprintf(&sb, "\n")
 	fmt.Fprintf(&sb, "=== MagicDNS configuration ===\n")
@@ -313,7 +313,7 @@ func formatDNSStatusText(data *tsdnsjsonv0.StatusResponse, all bool) string {
 
 	fmt.Fprintf(&sb, "=== System DNS configuration ===\n")
 	fmt.Fprintf(&sb, "\n")
-	fmt.Fprintf(&sb, "This is the DNS configuration that Tailscale believes your operating system is using.\nTailscale may use this configuration if 'Override Local DNS' is disabled in the admin console,\nor if no resolvers are provided by the coordination server.\n")
+	fmt.Fprintf(&sb, "This is the DNS configuration that MAE Routing believes your operating system is using.\nTailscale may use this configuration if 'Override Local DNS' is disabled in the admin console,\nor if no resolvers are provided by the coordination server.\n")
 	fmt.Fprintf(&sb, "\n")
 
 	if data.SystemDNSError != "" {

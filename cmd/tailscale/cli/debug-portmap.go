@@ -25,7 +25,7 @@ func init() {
 func mkDebugPortmapCmd() *ffcli.Command {
 	return &ffcli.Command{
 		Name:       "portmap",
-		ShortUsage: "tailscale debug portmap",
+		ShortUsage: "mae-routing debug portmap",
 		Exec:       debugPortmap,
 		ShortHelp:  "Run portmap debugging",
 		FlagSet: (func() *flag.FlagSet {

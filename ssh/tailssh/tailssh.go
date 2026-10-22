@@ -285,7 +285,7 @@ func (c *conn) vlogf(format string, args ...any) {
 // attempts and immediately disconnect the client.
 func (c *conn) errDenied(message string) error {
 	if message == "" {
-		message = "tailscale: access denied"
+		message = "mae-routing: access denied"
 	}
 	if err := c.spac.SendAuthBanner(message); err != nil {
 		c.logf("failed to send auth banner: %s", err)
@@ -648,14 +648,14 @@ func (c *conn) setInfo(cm ssh.ConnMetadata) error {
 		dst:     toIPPort(cm.LocalAddr()),
 	}
 	if !tsaddr.IsTailscaleIP(ci.dst.Addr()) {
-		return fmt.Errorf("tailssh: rejecting non-Tailscale local address %v", ci.dst)
+		return fmt.Errorf("tailssh: rejecting non-MAE Routing local address %v", ci.dst)
 	}
 	if !tsaddr.IsTailscaleIP(ci.src.Addr()) {
-		return fmt.Errorf("tailssh: rejecting non-Tailscale remote address %v", ci.src)
+		return fmt.Errorf("tailssh: rejecting non-MAE Routing remote address %v", ci.src)
 	}
 	node, uprof, ok := c.srv.lb.WhoIs("tcp", ci.src)
 	if !ok {
-		return fmt.Errorf("unknown Tailscale identity from src %v", ci.src)
+		return fmt.Errorf("unknown MAE Routing identity from src %v", ci.src)
 	}
 	ci.node = node
 	ci.uprof = uprof
@@ -924,7 +924,7 @@ func (ss *sshSession) run() {
 	defer ss.Close() // CHANNEL_CLOSE, last on the wire; see ss.Exit below.
 
 	if attached := ss.conn.srv.attachSessionToConnIfNotShutdown(ss); !attached {
-		fmt.Fprintf(ss, "Tailscale SSH is shutting down\r\n")
+		fmt.Fprintf(ss, "MAE Routing SSH is shutting down\r\n")
 		// 255 signals an SSH-layer failure (the session never reached the
 		// user's command), distinct from any exit status the remote
 		// program might produce. The ssh(1) EXIT STATUS section

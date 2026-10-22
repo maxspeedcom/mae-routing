@@ -28,16 +28,16 @@ const (
 	//
 	// We claim bits 16:23 entirely. For now we only use the lower four
 	// bits, leaving the higher 4 bits for future use.
-	LinuxFwmarkMask    = "0xff0000"
-	LinuxFwmarkMaskNum = 0xff0000
+	LinuxFwmarkMask    = "0x7f000000"
+	LinuxFwmarkMaskNum = 0x7f000000
 
 	// Packet is from Tailscale and to a subnet route destination, so
 	// is allowed to be routed through this machine.
-	LinuxSubnetRouteMark    = "0x40000"
-	LinuxSubnetRouteMarkNum = 0x40000
+	LinuxSubnetRouteMark    = "0x1000000"
+	LinuxSubnetRouteMarkNum = 0x1000000
 
 	// Packet was originated by tailscaled itself, and must not be
 	// routed over the Tailscale network.
-	LinuxBypassMark    = "0x80000"
-	LinuxBypassMarkNum = 0x80000
+	LinuxBypassMark    = "0x2000000"
+	LinuxBypassMarkNum = 0x2000000
 )

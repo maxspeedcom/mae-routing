@@ -714,7 +714,7 @@ func (b *LocalBackend) TailnetLockInit(keys []tka.Key, disablementValues [][]byt
 	b.mu.Unlock()
 
 	if ourNodeKey.IsZero() || nlPriv.IsZero() {
-		return errors.New("no node-key: is tailscale logged in?")
+		return errors.New("no node-key: is mae-routing logged in?")
 	}
 
 	var entropy [16]byte
@@ -910,7 +910,7 @@ func (b *LocalBackend) TailnetLockModify(addKeys, removeKeys []tka.Key) (err err
 		ourNodeKey = p.Persist().PublicNodeKey()
 	}
 	if ourNodeKey.IsZero() {
-		return errors.New("no node-key: is tailscale logged in?")
+		return errors.New("no node-key: is mae-routing logged in?")
 	}
 
 	var nlPriv key.NLPrivate
@@ -1005,7 +1005,7 @@ func (b *LocalBackend) TailnetLockDisable(secret []byte) error {
 	}
 
 	if ourNodeKey.IsZero() {
-		return errors.New("no node-key: is tailscale logged in?")
+		return errors.New("no node-key: is mae-routing logged in?")
 	}
 	_, err = b.tkaDoDisablement(ourNodeKey, head, secret)
 	return err
@@ -1209,7 +1209,7 @@ func (b *LocalBackend) TailnetLockSubmitRecoveryAUM(aum *tka.AUM) error {
 		ourNodeKey = p.Persist().PublicNodeKey()
 	}
 	if ourNodeKey.IsZero() {
-		return errors.New("no node-key: is tailscale logged in?")
+		return errors.New("no node-key: is mae-routing logged in?")
 	}
 
 	b.mu.Unlock()

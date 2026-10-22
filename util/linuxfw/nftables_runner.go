@@ -23,9 +23,9 @@ import (
 )
 
 const (
-	chainNameForward     = "ts-forward"
-	chainNameInput       = "ts-input"
-	chainNamePostrouting = "ts-postrouting"
+	chainNameForward     = "mr-forward"
+	chainNameInput       = "mr-input"
+	chainNamePostrouting = "mr-postrouting"
 )
 
 // chainTypeRegular is an nftables chain that does not apply to a hook.
@@ -284,7 +284,7 @@ func (n *nftablesRunner) ClampMSSToPMTU(tun string, addr netip.Addr) error {
 	// ensure ts-clamp chain exists
 	fwChain, err := getOrCreateChain(n.conn, chainInfo{
 		table:         filterTable,
-		name:          "ts-clamp",
+		name:          "mr-clamp",
 		chainType:     nftables.ChainTypeFilter,
 		chainHook:     nftables.ChainHookForward,
 		chainPriority: nftables.ChainPriorityMangle,
@@ -453,10 +453,10 @@ func getChainFromTable(c *nftables.Conn, table *nftables.Table, name string) (*n
 	return nil, errorChainNotFound{table.Name, name}
 }
 
-// isTSChain reports whether `name` begins with "ts-" (and is thus a
+// isTSChain reports whether `name` begins with "mr-" (and is thus a
 // Tailscale-managed chain).
 func isTSChain(name string) bool {
-	return strings.HasPrefix(name, "ts-")
+	return strings.HasPrefix(name, "mr-")
 }
 
 // createChainIfNotExist creates a chain with the given name in the given table
@@ -983,8 +983,8 @@ func (n *nftablesRunner) AddChains() error {
 // running on a system that doesn't support nftables. See
 // createDummyPostroutingChains.
 const (
-	tsDummyChainName = "ts-test-postrouting"
-	tsDummyTableName = "ts-test-nat"
+	tsDummyChainName = "mr-test-postrouting"
+	tsDummyTableName = "mr-test-nat"
 )
 
 // createDummyPostroutingChains creates dummy postrouting chains in netfilter
@@ -2277,7 +2277,7 @@ func (n *nftablesRunner) AddConnmarkSaveRule() error {
 		if err == nil {
 			rules, _ := conn.GetRules(preroutingChain.Table, preroutingChain)
 			for _, rule := range rules {
-				if string(rule.UserData) == "ts-connmark-restore" {
+				if string(rule.UserData) == "mr-connmark-restore" {
 					// Rules already exist, skip adding
 					return nil
 				}
@@ -2312,7 +2312,7 @@ func (n *nftablesRunner) AddConnmarkSaveRule() error {
 			Table:    mangleTable,
 			Chain:    preroutingChain,
 			Exprs:    makeConnmarkRestoreExprs(),
-			UserData: []byte("ts-connmark-restore"),
+			UserData: []byte("mr-connmark-restore"),
 		})
 
 		// Get or create OUTPUT chain
@@ -2333,7 +2333,7 @@ func (n *nftablesRunner) AddConnmarkSaveRule() error {
 			Table:    mangleTable,
 			Chain:    outputChain,
 			Exprs:    makeConnmarkSaveExprs(),
-			UserData: []byte("ts-connmark-save"),
+			UserData: []byte("mr-connmark-save"),
 		})
 	}
 
@@ -2359,7 +2359,7 @@ func (n *nftablesRunner) DelConnmarkSaveRule() error {
 		if err == nil {
 			rules, _ := conn.GetRules(preroutingChain.Table, preroutingChain)
 			for _, rule := range rules {
-				if string(rule.UserData) == "ts-connmark-restore" {
+				if string(rule.UserData) == "mr-connmark-restore" {
 					conn.DelRule(rule)
 					break
 				}
@@ -2371,7 +2371,7 @@ func (n *nftablesRunner) DelConnmarkSaveRule() error {
 		if err == nil {
 			rules, _ := conn.GetRules(outputChain.Table, outputChain)
 			for _, rule := range rules {
-				if string(rule.UserData) == "ts-connmark-save" {
+				if string(rule.UserData) == "mr-connmark-save" {
 					conn.DelRule(rule)
 					break
 				}
@@ -2428,7 +2428,7 @@ func NfTablesCleanUp(logf logger.Logf) {
 
 	for _, table := range tables {
 		// These table names were used briefly in 1.48.0.
-		if table.Name == "ts-filter" || table.Name == "ts-nat" {
+		if table.Name == "mr-filter" || table.Name == "mr-nat" {
 			conn.DelTable(table)
 			if err := conn.Flush(); err != nil {
 				logf("cleanup: flush delete table %s: %s", table.Name, err)

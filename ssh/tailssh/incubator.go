@@ -144,7 +144,7 @@ func (ss *sshSession) newIncubatorCommand(logf logger.Logf) (cmd *exec.Cmd, forw
 		if isSFTP {
 			// SFTP relies on the embedded Go-based SFTP server in tailscaled,
 			// so without tailscaled, we can't serve SFTP.
-			return nil, nil, errors.New("no tailscaled found on path, can't serve SFTP")
+			return nil, nil, errors.New("no mae-routingd found on path, can't serve SFTP")
 		}
 
 		loginShell := ss.conn.localUser.LoginShell()
@@ -301,7 +301,7 @@ func parseIncubatorArgs(args []string) (incubatorArgs, error) {
 	flags.StringVar(&ia.localUser, "local-user", "", "the user to run as")
 	flags.StringVar(&ia.homeDir, "home-dir", "/", "the user's home directory")
 	flags.StringVar(&ia.remoteUser, "remote-user", "", "the remote user/tags")
-	flags.StringVar(&ia.remoteIP, "remote-ip", "", "the remote Tailscale IP")
+	flags.StringVar(&ia.remoteIP, "remote-ip", "", "the remote MAE Routing IP")
 	flags.StringVar(&ia.ttyName, "tty-name", "", "the tty name (pts/3)")
 	flags.BoolVar(&ia.hasTTY, "has-tty", false, "is the output attached to a tty")
 	flags.StringVar(&ia.cmd, "cmd", "", "the cmd to launch, including all arguments (ignored in sftp mode)")
@@ -403,8 +403,8 @@ func beIncubator(args []string) error {
 		return err
 	}
 	if ia.encodedEnv != "" {
-		log.Printf("WARNING: tailscaled be-child: accepted SSH environment variables were passed via the deprecated --encoded-env flag; " +
-			"the running tailscaled is outdated. Update tailscaled to the latest version and restart for the latest security fixes.")
+		log.Printf("WARNING: mae-routingd be-child: accepted SSH environment variables were passed via the deprecated --encoded-env flag; " +
+			"the running mae-routingd is outdated. Update mae-routingd to the latest version and restart for the latest security fixes.")
 	}
 	if err := ia.loadForwardedEnv(); err != nil {
 		return err

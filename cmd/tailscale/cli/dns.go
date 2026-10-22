@@ -13,11 +13,11 @@ var dnsCmd = &ffcli.Command{
 	Name:      "dns",
 	ShortHelp: "Diagnose the internal DNS forwarder",
 	LongHelp: strings.TrimSpace(`
-The 'tailscale dns' subcommand provides tools for diagnosing the internal DNS
-forwarder (100.100.100.100).
+The 'mae-routing dns' subcommand provides tools for diagnosing the internal DNS
+forwarder (10.77.77.77).
 
-For more information about the DNS functionality built into Tailscale, refer to
-https://tailscale.com/kb/1054/dns.
+For more information about the DNS functionality built into MAE Routing, refer to
+https://routing.maesuaisystem.com/
 `),
 	ShortUsage: strings.Join([]string{
 		dnsStatusCmd.ShortUsage,

@@ -28,8 +28,8 @@ import (
 
 var statusCmd = &ffcli.Command{
 	Name:       "status",
-	ShortUsage: "tailscale status [--active] [--web] [--json]",
-	ShortHelp:  "Show state of tailscaled and its connections",
+	ShortUsage: "mae-routing status [--active] [--web] [--json]",
+	ShortHelp:  "Show state of mae-routingd and its connections",
 	LongHelp: strings.TrimSpace(`
 
 JSON FORMAT
@@ -39,10 +39,10 @@ in the future.
 
 For a description of the fields, see the "type Status" declaration at:
 
-https://github.com/tailscale/tailscale/blob/main/ipn/ipnstate/ipnstate.go
+https://github.com/maxspeedcom/mae-routing/blob/main/ipn/ipnstate/ipnstate.go
 
 (and be sure to select branch/tag that corresponds to the version
- of Tailscale you're running)
+ of MAE Routing you're running)
 
 `),
 	Exec: runStatus,
@@ -75,7 +75,7 @@ const mullvadTCD = "mullvad.ts.net."
 
 func runStatus(ctx context.Context, args []string) error {
 	if len(args) > 0 {
-		return errors.New("unexpected non-flag arguments to 'tailscale status'")
+		return errors.New("unexpected non-flag arguments to 'mae-routing status'")
 	}
 	getStatus := localClient.Status
 	if !statusArgs.peers {
@@ -106,7 +106,7 @@ func runStatus(ctx context.Context, args []string) error {
 			return err
 		}
 		statusURL := netmon.HTTPOfListener(ln)
-		printf("Serving Tailscale status at %v ...\n", statusURL)
+		printf("Serving MAE Routing status at %v ...\n", statusURL)
 		go func() {
 			<-ctx.Done()
 			ln.Close()
@@ -241,7 +241,7 @@ func runStatus(ctx context.Context, args []string) error {
 
 	if locBasedExitNode {
 		outln()
-		printf("# To see the full list of exit nodes, including location-based exit nodes, run `tailscale exit-node list`  \n")
+		printf("# To see the full list of exit nodes, including location-based exit nodes, run `mae-routing exit-node list`  \n")
 	}
 	if len(st.Health) > 0 {
 		outln()
@@ -264,7 +264,7 @@ func isRunningOrStarting(st *ipnstate.Status) (description string, ok bool) {
 	default:
 		return fmt.Sprintf("unexpected state: %s", st.BackendState), false
 	case ipn.Stopped.String():
-		return "Tailscale is stopped.", false
+		return "MAE Routing is stopped.", false
 	case ipn.NeedsLogin.String():
 		s := "Logged out."
 		if st.AuthURL != "" {

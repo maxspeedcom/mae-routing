@@ -24,7 +24,7 @@ func init() {
 func mkDebugPeerRelaySessionsCmd() *ffcli.Command {
 	return &ffcli.Command{
 		Name:       "peer-relay-sessions",
-		ShortUsage: "tailscale debug peer-relay-sessions",
+		ShortUsage: "mae-routing debug peer-relay-sessions",
 		Exec:       runPeerRelaySessions,
 		ShortHelp:  "Print the current set of active peer relay sessions relayed through this node",
 	}
@@ -41,7 +41,7 @@ func runPeerRelaySessions(ctx context.Context, args []string) error {
 
 	f("Server port: ")
 	if srv.UDPPort == nil {
-		f("not configured (you can configure the port with 'tailscale set --relay-server-port=<PORT>')")
+		f("not configured (you can configure the port with 'mae-routing set --relay-server-port=<PORT>')")
 	} else {
 		f("%d", *srv.UDPPort)
 	}

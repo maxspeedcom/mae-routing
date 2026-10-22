@@ -4,7 +4,7 @@
 description="MAE Routing node agent"
 [ -f /etc/default/mae-routingd ] && . /etc/default/mae-routingd
 command="/usr/sbin/mae-routingd"
-command_args="--state=/var/lib/mae-routing/mae-routingd.state --socket=/run/mae-routing/mae-routingd.sock --port=${PORT:-41641} ${FLAGS}"
+command_args="--state=/var/lib/mae-routing/mae-routingd.state --socket=/run/mae-routing/mae-routingd.sock --port=${PORT:-41642} ${FLAGS}"
 command_background=true
 pidfile="/run/${RC_SVCNAME}.pid"
 output_log="/var/log/mae-routingd.log"

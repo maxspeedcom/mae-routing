@@ -230,7 +230,7 @@ func (s netmapState) processNotify(ctx context.Context, client *local.Client, n 
 	if n.SelfChange != nil {
 		dns, err := client.DNSConfig(ctx)
 		if err != nil {
-			log.Printf("error refreshing DNS config from tailscaled: %v", err)
+			log.Printf("error refreshing DNS config from mae-routingd: %v", err)
 		} else if dns != nil {
 			s.dnsExtraRecords = views.SliceOf(dns.ExtraRecords)
 			s.certDomains = views.SliceOf(dns.CertDomains)
@@ -307,7 +307,7 @@ func (w *reconnectingIPNBusWatcher) Next() (ipn.Notify, error) {
 		n, err := w.watcher.Next()
 		if err == nil {
 			if n.ErrMessage != nil {
-				log.Printf("tailscaled IPN bus error: %s", *n.ErrMessage)
+				log.Printf("mae-routingd IPN bus error: %s", *n.ErrMessage)
 			}
 			return n, nil
 		}
@@ -431,9 +431,9 @@ func run() error {
 		if cfg.ProxyTargetIP != "" || cfg.ProxyTargetDNSName != "" || cfg.Routes != nil || cfg.TailnetTargetIP != "" || cfg.TailnetTargetFQDN != "" {
 			if err := ensureIPForwarding(cfg.Root, cfg.ProxyTargetIP, cfg.TailnetTargetIP, cfg.TailnetTargetFQDN, cfg.Routes); err != nil {
 				log.Printf("Failed to enable IP forwarding: %v", err)
-				log.Printf("To run tailscale as a proxy or router container, IP forwarding must be enabled.")
+				log.Printf("To run mae-routing as a proxy or router container, IP forwarding must be enabled.")
 				if cfg.InKubernetes {
-					return fmt.Errorf("you can either set the sysctls as a privileged initContainer, or run the tailscale container with privileged=true.")
+					return fmt.Errorf("you can either set the sysctls as a privileged initContainer, or run the mae-routing container with privileged=true.")
 				} else {
 					return fmt.Errorf("you can fix this by running the container with privileged=true, or the equivalent in your container runtime that permits access to sysctls.")
 				}
@@ -478,7 +478,7 @@ func run() error {
 
 	client, daemonProcess, err := startTailscaled(bootCtx, cfg)
 	if err != nil {
-		return fmt.Errorf("failed to bring up tailscale: %w", err)
+		return fmt.Errorf("failed to bring up mae-routing: %w", err)
 	}
 	killTailscaled := func() {
 		// The default termination grace period for a Pod is 30s. We wait 25s at
@@ -503,9 +503,9 @@ func run() error {
 				log.Printf("Error waiting for consistent state on shutdown: %v", err)
 			}
 		}
-		log.Printf("Sending SIGTERM to tailscaled")
+		log.Printf("Sending SIGTERM to mae-routingd")
 		if err := daemonProcess.Signal(unix.SIGTERM); err != nil {
-			log.Fatalf("error shutting tailscaled down: %v", err)
+			log.Fatalf("error shutting mae-routingd down: %v", err)
 		}
 	}
 	defer killTailscaled()
@@ -569,7 +569,7 @@ func run() error {
 			err = syscall.Symlink(cfg.Socket, defaultTailscaledSocketPath)
 		}
 		if err != nil {
-			log.Printf("[warning] failed to symlink socket: %v\n\tTo interact with the Tailscale CLI please use `tailscale --socket=%q`", err, cfg.Socket)
+			log.Printf("[warning] failed to symlink socket: %v\n\tTo interact with the MAE Routing CLI please use `mae-routing --socket=%q`", err, cfg.Socket)
 		}
 	}
 
@@ -588,7 +588,7 @@ func run() error {
 		didLogin = true
 		w.Close()
 		if err := tailscaleUp(bootCtx, cfg); err != nil {
-			return fmt.Errorf("failed to auth tailscale: %w", err)
+			return fmt.Errorf("failed to auth mae-routing: %w", err)
 		}
 		authWatchMask = watchMask
 		w.SetMask(authWatchMask)
@@ -597,7 +597,7 @@ func run() error {
 
 	if isTwoStepConfigAlwaysAuth(cfg) {
 		if err := authTailscale(); err != nil {
-			return fmt.Errorf("failed to auth tailscale: %w", err)
+			return fmt.Errorf("failed to auth mae-routing: %w", err)
 		}
 	}
 
@@ -605,7 +605,7 @@ authLoop:
 	for {
 		n, err := w.Next()
 		if err != nil {
-			return fmt.Errorf("reading tailscaled IPN bus: %w", err)
+			return fmt.Errorf("reading mae-routingd IPN bus: %w", err)
 		}
 
 		if state, ok := notifyState(n); ok {
@@ -628,11 +628,11 @@ authLoop:
 						return nil
 					}
 
-					return errors.New("invalid state: tailscaled daemon started with a config file, but tailscale is not logged in: ensure you pass a valid auth key in the config file")
+					return errors.New("invalid state: mae-routingd daemon started with a config file, but mae-routing is not logged in: ensure you pass a valid auth key in the config file")
 				}
 
 				if err := authTailscale(); err != nil {
-					return fmt.Errorf("failed to auth tailscale: %w", err)
+					return fmt.Errorf("failed to auth mae-routing: %w", err)
 				}
 			case ipn.NeedsMachineAuth:
 				log.Printf("machine authorization required, please visit the admin panel")
@@ -645,7 +645,7 @@ authLoop:
 				// deadline to continue monitoring for changes.
 				break authLoop
 			default:
-				log.Printf("tailscaled in state %q, waiting", state)
+				log.Printf("mae-routingd in state %q, waiting", state)
 			}
 		}
 
@@ -677,7 +677,7 @@ authLoop:
 		// Now that we are authenticated, we can set/reset any of the
 		// settings that we need to.
 		if err := tailscaleSet(ctx, cfg); err != nil {
-			return fmt.Errorf("failed to auth tailscale: %w", err)
+			return fmt.Errorf("failed to auth mae-routing: %w", err)
 		}
 	}
 
@@ -809,9 +809,9 @@ runLoop:
 			killTailscaled()
 			break runLoop
 		case err := <-errChan:
-			return fmt.Errorf("reading tailscaled IPN bus: %w", err)
+			return fmt.Errorf("reading mae-routingd IPN bus: %w", err)
 		case err := <-cfgWatchErrChan:
-			return fmt.Errorf("failed to watch tailscaled config: %w", err)
+			return fmt.Errorf("failed to watch mae-routingd config: %w", err)
 		case n := <-notifyChan:
 			nmState = nmState.processNotify(ctx, client, n)
 			if state, ok := notifyState(n); ok && state != ipn.Running {
@@ -820,7 +820,7 @@ runLoop:
 				// control flow required to make it work now is hard. So, just crash
 				// the container and rely on the container runtime to restart us,
 				// whereupon we'll go through initial auth again.
-				return fmt.Errorf("tailscaled left running state (now in state %q), exiting", state)
+				return fmt.Errorf("mae-routingd left running state (now in state %q), exiting", state)
 			}
 			if n.InitialStatus != nil || n.SelfChange != nil || len(n.PeersChanged) != 0 || len(n.PeersRemoved) != 0 || len(n.PeerChangedPatch) != 0 {
 				processNetmap = true
@@ -1080,9 +1080,9 @@ runLoop:
 							continue
 						}
 						if err != nil {
-							log.Fatalf("Waiting for tailscaled to exit: %v", err)
+							log.Fatalf("Waiting for mae-routingd to exit: %v", err)
 						}
-						log.Print("tailscaled exited")
+						log.Print("mae-routingd exited")
 						os.Exit(0)
 					}
 				}
@@ -1175,7 +1175,7 @@ func tailscaledConfigFilePath() string {
 	}
 	fe, err := os.ReadDir(dir)
 	if err != nil {
-		log.Fatalf("error reading tailscaled config directory %q: %v", dir, err)
+		log.Fatalf("error reading mae-routingd config directory %q: %v", dir, err)
 	}
 	maxCompatVer := tailcfg.CapabilityVersion(-1)
 	for _, e := range fe {
@@ -1194,10 +1194,10 @@ func tailscaledConfigFilePath() string {
 		}
 	}
 	if maxCompatVer == -1 {
-		log.Fatalf("no tailscaled config file found in %q for current capability version %d", dir, tailcfg.CurrentCapabilityVersion)
+		log.Fatalf("no mae-routingd config file found in %q for current capability version %d", dir, tailcfg.CurrentCapabilityVersion)
 	}
 	filePath := filepath.Join(dir, kubeutils.TailscaledConfigFileName(maxCompatVer))
-	log.Printf("Using tailscaled config file %q to match current capability version %d", filePath, tailcfg.CurrentCapabilityVersion)
+	log.Printf("Using mae-routingd config file %q to match current capability version %d", filePath, tailcfg.CurrentCapabilityVersion)
 	return filePath
 }
 
@@ -1262,7 +1262,7 @@ func resolveTailnetFQDN(nm netmapState, fqdn string) ([]netip.Prefix, error) {
 		return nil, fmt.Errorf("resolved 4via6 address %v for %q but no peer advertises a route containing it", addr, fqdn)
 	}
 
-	return nil, fmt.Errorf("could not find Tailscale node, service or 4via6 address %q; it either does not exist, or not reachable because of ACLs", fqdn)
+	return nil, fmt.Errorf("could not find MAE Routing node, service or 4via6 address %q; it either does not exist, or not reachable because of ACLs", fqdn)
 }
 
 // serviceIPsFromNetMap returns all IPs of a Tailscale Service if its FQDN is

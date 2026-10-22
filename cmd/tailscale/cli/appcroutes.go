@@ -23,7 +23,7 @@ var appcRoutesArgs struct {
 
 var appcRoutesCmd = &ffcli.Command{
 	Name:       "appc-routes",
-	ShortUsage: "tailscale appc-routes",
+	ShortUsage: "mae-routing appc-routes",
 	Exec:       runAppcRoutesInfo,
 	ShortHelp:  "Print the current app connector routes",
 	FlagSet: (func() *flag.FlagSet {
@@ -34,7 +34,7 @@ var appcRoutesCmd = &ffcli.Command{
 		return fs
 	})(),
 	LongHelp: strings.TrimSpace(`
-The 'tailscale appc-routes' command prints the current App Connector route status.
+The 'mae-routing appc-routes' command prints the current App Connector route status.
 
 By default this command prints the domains configured in the app connector configuration and how many routes have been
 learned for each domain.
@@ -47,7 +47,7 @@ in the policy app connector 'routes' field.
 -n prints the total number of routes advertised by this device, whether learned, set in the policy, or set locally.
 
 For more information about App Connectors, refer to
-https://tailscale.com/kb/1281/app-connectors
+https://routing.maesuaisystem.com/
 `),
 }
 

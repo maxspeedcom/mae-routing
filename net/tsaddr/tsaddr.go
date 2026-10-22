@@ -32,7 +32,7 @@ var chromeOSRange oncePrefix
 // See https://tailscale.com/s/cgnat
 // Note that Tailscale does not assign out of the ChromeOSVMRange.
 func CGNATRange() netip.Prefix {
-	cgnatRange.Do(func() { mustPrefix(&cgnatRange.v, "100.64.0.0/10") })
+	cgnatRange.Do(func() { mustPrefix(&cgnatRange.v, "10.77.0.0/16") })
 	return cgnatRange.v
 }
 
@@ -50,7 +50,7 @@ var (
 //
 // For IPv6, use TailscaleServiceIPv6.
 func TailscaleServiceIP() netip.Addr {
-	return netaddr.IPv4(100, 100, 100, 100) // "100.100.100.100" for those grepping
+	return netaddr.IPv4(10, 77, 77, 77) // "10.77.77.77" for those grepping (MAE Routing)
 }
 
 // TailscaleServiceIPv6 returns the IPv6 listen address of the services
@@ -63,8 +63,8 @@ func TailscaleServiceIPv6() netip.Addr {
 }
 
 const (
-	TailscaleServiceIPString   = "100.100.100.100"
-	TailscaleServiceIPv6String = "fd7a:115c:a1e0::53"
+	TailscaleServiceIPString   = "10.77.77.77"
+	TailscaleServiceIPv6String = "fd4d:4145:5254::53"
 )
 
 // IsTailscaleIP reports whether IP is an IP address in a range that
@@ -87,7 +87,7 @@ func IsTailscaleIPv4(ip netip.Addr) bool {
 // TailscaleULARange returns the IPv6 Unique Local Address range that
 // is the superset range that Tailscale assigns out of.
 func TailscaleULARange() netip.Prefix {
-	tsUlaRange.Do(func() { mustPrefix(&tsUlaRange.v, "fd7a:115c:a1e0::/48") })
+	tsUlaRange.Do(func() { mustPrefix(&tsUlaRange.v, "fd4d:4145:5254::/48") })
 	return tsUlaRange.v
 }
 
@@ -95,7 +95,7 @@ func TailscaleULARange() netip.Prefix {
 // TailscaleULARange that's used for IPv4 tunneling via IPv6.
 func TailscaleViaRange() netip.Prefix {
 	// Mnemonic: "b1a" sounds like "via".
-	tsViaRange.Do(func() { mustPrefix(&tsViaRange.v, "fd7a:115c:a1e0:b1a::/64") })
+	tsViaRange.Do(func() { mustPrefix(&tsViaRange.v, "fd4d:4145:5254:b1a::/64") })
 	return tsViaRange.v
 }
 
@@ -105,7 +105,7 @@ func Tailscale4To6Range() netip.Prefix {
 	// This IP range has no significance, beyond being a subset of
 	// TailscaleULARange. The bits from /48 to /104 were picked at
 	// random.
-	ula4To6Range.Do(func() { mustPrefix(&ula4To6Range.v, "fd7a:115c:a1e0:ab12:4843:cd96:6200::/104") })
+	ula4To6Range.Do(func() { mustPrefix(&ula4To6Range.v, "fd4d:4145:5254:ab12:4843:cd96:6200::/104") })
 	return ula4To6Range.v
 }
 
@@ -116,7 +116,7 @@ func TailscaleEphemeral6Range() netip.Prefix {
 	// TailscaleULARange. The bits from /48 to /64 were picked at
 	// random, with the only criterion being to not be the conflict
 	// with the Tailscale4To6Range above.
-	ulaEph6Range.Do(func() { mustPrefix(&ulaEph6Range.v, "fd7a:115c:a1e0:efe3::/64") })
+	ulaEph6Range.Do(func() { mustPrefix(&ulaEph6Range.v, "fd4d:4145:5254:efe3::/64") })
 	return ulaEph6Range.v
 }
 

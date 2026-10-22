@@ -166,7 +166,7 @@ func RunWithContext(ctx context.Context, args []string) (err error) {
 
 	err = rootCmd.Run(ctx)
 	if local.IsAccessDeniedError(err) && os.Getuid() != 0 && runtime.GOOS != "windows" {
-		return fmt.Errorf("%v\n\nUse 'sudo tailscale %s'.\nTo not require root, use 'sudo tailscale set --operator=$USER' once.", err, strings.Join(args, " "))
+		return fmt.Errorf("%v\n\nUse 'sudo mae-routing %s'.\nTo not require root, use 'sudo mae-routing set --operator=$USER' once.", err, strings.Join(args, " "))
 	}
 	if errors.Is(err, flag.ErrHelp) {
 		return nil
@@ -252,7 +252,7 @@ var (
 
 func newRootCmd(tb ...testenv.TB) *ffcli.Command {
 	rootfs := newFlagSet("tailscale")
-	rootfs.Func("socket", "path to tailscaled socket", func(s string) error {
+	rootfs.Func("socket", "path to mae-routingd socket", func(s string) error {
 		localClient.Socket = s
 		localClient.UseSocketOnly = true
 		return nil
@@ -266,7 +266,7 @@ func newRootCmd(tb ...testenv.TB) *ffcli.Command {
 		ShortUsage: "mae-routing [flags] <subcommand> [command flags]",
 		ShortHelp:  "MAE Routing: your organisation's private network (routing.maesuaisystem.com).",
 		LongHelp: strings.TrimSpace(`
-For help on subcommands, add --help after: "tailscale status --help".
+For help on subcommands, add --help after: "mae-routing status --help".
 
 This CLI is still under active development. Commands and flags will
 change in the future.
@@ -318,7 +318,7 @@ change in the future.
 				return printJSONDocs(rootCmd)
 			}
 			if len(args) > 0 {
-				return fmt.Errorf("tailscale: unknown subcommand: %s", args[0])
+				return fmt.Errorf("mae-routing: unknown subcommand: %s", args[0])
 			}
 			return flag.ErrHelp
 		},

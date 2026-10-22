@@ -48,16 +48,16 @@ func serviceListerFromContext(ctx context.Context) serviceLister {
 	return &localClient
 }
 
-const serviceListUsage = "tailscale service list"
+const serviceListUsage = "mae-routing service list"
 
 var serviceCmd = &ffcli.Command{
 	Name:       "service",
-	ShortHelp:  "Interact with Tailscale Services",
-	ShortUsage: "tailscale service",
+	ShortHelp:  "Interact with MAE Routing Services",
+	ShortUsage: "mae-routing service",
 	LongHelp: strings.TrimSpace(`
-The 'tailscale service' command groups subcommands for Tailscale Services.
+The 'mae-routing service' command groups subcommands for MAE Routing Services.
 
-A Tailscale Service is a virtual service with its own IP addresses. Which
+A MAE Routing Service is a virtual service with its own IP addresses. Which
 Services this node can reach is determined by the tailnet's ACLs. Use the 'list'
 subcommand to see the Services currently available to this node.
 `),
@@ -67,7 +67,7 @@ subcommand to see the Services currently available to this node.
 		{
 			Name:       "list",
 			ShortUsage: serviceListUsage,
-			ShortHelp:  "List the Tailscale Services your node can access",
+			ShortHelp:  "List the MAE Routing Services your node can access",
 			Exec:       runServiceList,
 			FlagSet: func() *flag.FlagSet {
 				fs := newFlagSet("list")
@@ -136,7 +136,7 @@ func runServiceList(ctx context.Context, args []string) error {
 	}
 
 	if len(entries) == 0 {
-		fmt.Fprintln(Stdout, "No Tailscale Services are available to this node.")
+		fmt.Fprintln(Stdout, "No MAE Routing Services are available to this node.")
 		return nil
 	}
 

@@ -237,7 +237,7 @@ func (s *Server) serveHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	io.WriteString(w, "<html><title>Tailscale</title><body><h1>Tailscale</h1>This is the local Tailscale daemon.\n")
+	io.WriteString(w, "<html><title>MAE Routing</title><body><h1>MAE Routing</h1>This is the local MAE Routing daemon.\n")
 }
 
 // inUseOtherUserError is the error type for when the server is in use
@@ -269,7 +269,7 @@ func (s *Server) checkConnIdentityLocked(ci ipnauth.Actor) error {
 
 			if ci.UserID() != active.UserID() {
 				var b strings.Builder
-				b.WriteString("Tailscale already in use")
+				b.WriteString("MAE Routing already in use")
 				if username, err := active.Username(); err == nil {
 					fmt.Fprintf(&b, " by %s", username)
 				}

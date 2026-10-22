@@ -46,15 +46,15 @@ import (
 
 var upCmd = &ffcli.Command{
 	Name:       "up",
-	ShortUsage: "tailscale up [flags]",
-	ShortHelp:  "Connect to Tailscale, logging in if needed",
+	ShortUsage: "mae-routing up [flags]",
+	ShortHelp:  "Connect to MAE Routing, logging in if needed",
 
 	LongHelp: strings.TrimSpace(`
-"tailscale up" connects this machine to your Tailscale network,
+"mae-routing up" connects this machine to your MAE Routing network,
 triggering authentication if necessary.
 
-With no flags, "tailscale up" brings the network online without
-changing any settings. (That is, it's the opposite of "tailscale
+With no flags, "mae-routing up" brings the network online without
+changing any settings. (That is, it's the opposite of "mae-routing
 down").
 
 If flags are specified, the flags must be the complete set of desired
@@ -107,10 +107,10 @@ func newUpFlagSet(goos string, upArgs *upArgsT, cmd string) *flag.FlagSet {
 
 	upf.StringVar(&upArgs.server, "login-server", ipn.DefaultControlURL, "base URL of control server")
 	upf.Var(&orgFlag{fs: upf}, "org", "MAE Routing network name; same as --login-server=https://<org>.routing.maesuaisystem.com")
-	upf.BoolVar(&upArgs.acceptRoutes, "accept-routes", acceptRouteDefault(goos), "accept routes advertised by other Tailscale nodes")
+	upf.BoolVar(&upArgs.acceptRoutes, "accept-routes", acceptRouteDefault(goos), "accept routes advertised by other MAE Routing nodes")
 	upf.BoolVar(&upArgs.acceptDNS, "accept-dns", true, "accept DNS configuration from the admin panel")
-	upf.Var(notFalseVar{}, "host-routes", hidden+"install host routes to other Tailscale nodes (must be true as of Tailscale 1.67+)")
-	upf.StringVar(&upArgs.exitNodeIP, "exit-node", "", "Tailscale exit node (IP, base name, or auto:any) for internet traffic, or empty string to not use an exit node")
+	upf.Var(notFalseVar{}, "host-routes", hidden+"install host routes to other MAE Routing nodes (must be true as of MAE Routing 1.67+)")
+	upf.StringVar(&upArgs.exitNodeIP, "exit-node", "", "MAE Routing exit node (IP, base name, or auto:any) for internet traffic, or empty string to not use an exit node")
 	upf.BoolVar(&upArgs.exitNodeAllowLANAccess, "exit-node-allow-lan-access", false, "allow direct access to the local network when routing traffic via an exit node")
 	upf.BoolVar(&upArgs.shieldsUp, "shields-up", false, "don't allow incoming connections")
 	upf.BoolVar(&upArgs.runSSH, "ssh", false, "run an SSH server, permitting access per tailnet admin's declared policy")
@@ -122,7 +122,7 @@ func newUpFlagSet(goos string, upArgs *upArgsT, cmd string) *flag.FlagSet {
 	upf.BoolVar(&upArgs.postureChecking, "report-posture", false, "allow management plane to gather device posture information")
 
 	if safesocket.GOOSUsesPeerCreds(goos) {
-		upf.StringVar(&upArgs.opUser, "operator", "", "Unix username to allow to operate on tailscaled without sudo")
+		upf.StringVar(&upArgs.opUser, "operator", "", "Unix username to allow to operate on mae-routingd without sudo")
 	}
 	switch goos {
 	case "linux":
@@ -132,9 +132,9 @@ func newUpFlagSet(goos string, upArgs *upArgsT, cmd string) *flag.FlagSet {
 	case "freebsd":
 		upf.BoolVar(&upArgs.snat, "snat-subnet-routes", true, "source NAT traffic to local routes advertised with --advertise-routes")
 	case "windows":
-		upf.BoolVar(&upArgs.forceDaemon, "unattended", false, "run in \"Unattended Mode\" where Tailscale keeps running even after the current GUI user logs out (Windows-only)")
+		upf.BoolVar(&upArgs.forceDaemon, "unattended", false, "run in \"Unattended Mode\" where MAE Routing keeps running even after the current GUI user logs out (Windows-only)")
 	}
-	upf.DurationVar(&upArgs.timeout, "timeout", 0, "maximum amount of time to wait for tailscaled to enter a Running state; default (0s) blocks forever")
+	upf.DurationVar(&upArgs.timeout, "timeout", 0, "maximum amount of time to wait for mae-routingd to enter a Running state; default (0s) blocks forever")
 
 	if cmd == "login" {
 		upf.StringVar(&upArgs.profileName, "nickname", "", "short name for the account")
@@ -147,7 +147,7 @@ func newUpFlagSet(goos string, upArgs *upArgsT, cmd string) *flag.FlagSet {
 
 		// There's no --force-reauth flag on "login" because all login commands
 		// trigger a reauth.
-		upf.BoolVar(&upArgs.forceReauth, "force-reauth", false, "force reauthentication (WARNING: this may bring down the Tailscale connection and thus should not be done remotely over SSH or RDP)")
+		upf.BoolVar(&upArgs.forceReauth, "force-reauth", false, "force reauthentication (WARNING: this may bring down the MAE Routing connection and thus should not be done remotely over SSH or RDP)")
 		registerAcceptRiskFlag(upf, &upArgs.acceptedRisks)
 	}
 
@@ -459,7 +459,7 @@ func updatePrefs(prefs, curPrefs *ipn.Prefs, env upCheckEnv) (simpleUp bool, jus
 	}
 
 	if env.upArgs.forceReauth && isSSHOverTailscale() {
-		if err := presentRiskToUser(riskLoseSSH, `You are connected over Tailscale; this action may result in your SSH session disconnecting.`, env.upArgs.acceptedRisks); err != nil {
+		if err := presentRiskToUser(riskLoseSSH, `You are connected over MAE Routing; this action may result in your SSH session disconnecting.`, env.upArgs.acceptedRisks); err != nil {
 			return false, nil, err
 		}
 	}
@@ -496,9 +496,9 @@ func presentSSHToggleRisk(wantSSH, haveSSH bool, acceptedRisks string) error {
 		return nil
 	}
 	if wantSSH {
-		return presentRiskToUser(riskLoseSSH, `You are connected over Tailscale; this action will reroute SSH traffic to Tailscale SSH and will result in your session disconnecting.`, acceptedRisks)
+		return presentRiskToUser(riskLoseSSH, `You are connected over MAE Routing; this action will reroute SSH traffic to MAE Routing SSH and will result in your session disconnecting.`, acceptedRisks)
 	}
-	return presentRiskToUser(riskLoseSSH, `You are connected using Tailscale SSH; this action will result in your session disconnecting.`, acceptedRisks)
+	return presentRiskToUser(riskLoseSSH, `You are connected using MAE Routing SSH; this action will result in your session disconnecting.`, acceptedRisks)
 }
 
 func runUp(ctx context.Context, cmd string, args []string, upArgs upArgsT) (retErr error) {
@@ -539,7 +539,7 @@ func runUp(ctx context.Context, cmd string, args []string, upArgs upArgsT) (retE
 	}
 
 	if distro.Get() == distro.Synology {
-		notSupported := "not supported on Synology; see https://github.com/tailscale/tailscale/issues/1995"
+		notSupported := "not supported on Synology; see https://github.com/maxspeedcom/mae-routing/issues/1995"
 		if upArgs.acceptRoutes {
 			return errors.New("--accept-routes is " + notSupported)
 		}
@@ -830,7 +830,7 @@ func runUp(ctx context.Context, cmd string, args []string, upArgs upArgsT) (retE
 		}
 		return err
 	case <-timeoutCh:
-		return errors.New(`timeout waiting for Tailscale service to enter a Running state; check health with "tailscale status"`)
+		return errors.New(`timeout waiting for MAE Routing service to enter a Running state; check health with "mae-routing status"`)
 	}
 }
 
@@ -979,7 +979,7 @@ func updateMaskedPrefsFromUpOrSetFlag(mp *ipn.MaskedPrefs, flagName string) {
 	panic(fmt.Sprintf("internal error: unhandled flag %q", flagName))
 }
 
-const accidentalUpPrefix = "Error: changing settings via 'tailscale up' requires mentioning all\n" +
+const accidentalUpPrefix = "Error: changing settings via 'mae-routing up' requires mentioning all\n" +
 	"non-default flags. To proceed, either re-run your command with --reset or\n" +
 	"use the command below to explicitly mention the current value of\n" +
 	"all non-default settings:\n\n" +

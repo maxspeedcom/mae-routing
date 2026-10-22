@@ -106,12 +106,12 @@ func NewOSConfigurator(logf logger.Logf, health *health.Tracker, bus *eventbus.B
 		if f, ok := optNewResolvedManager.GetOk(); ok {
 			return f(logf, health, interfaceName)
 		}
-		return nil, fmt.Errorf("tailscaled was built without DNS %q support", mode)
+		return nil, fmt.Errorf("mae-routingd was built without DNS %q support", mode)
 	case "network-manager":
 		if f, ok := optNewNMManager.GetOk(); ok {
 			return f(interfaceName)
 		}
-		return nil, fmt.Errorf("tailscaled was built without DNS %q support", mode)
+		return nil, fmt.Errorf("mae-routingd was built without DNS %q support", mode)
 	case "debian-resolvconf":
 		return newDebianResolvconfManager(logf)
 	case "openresolv":
@@ -327,7 +327,7 @@ func dnsMode(logf logger.Logf, health *health.Tracker, env newOSConfigEnv) (ret 
 			return "direct", nil
 		}
 
-		health.SetDNSManagerHealth(errors.New("systemd-resolved and NetworkManager are wired together incorrectly; MagicDNS will probably not work. For more info, see https://tailscale.com/s/resolved-nm"))
+		health.SetDNSManagerHealth(errors.New("systemd-resolved and NetworkManager are wired together incorrectly; MagicDNS will probably not work. For more info, see https://routing.maesuaisystem.com/"))
 		dbg("nm-safe", "no")
 		return "systemd-resolved", nil
 	default:

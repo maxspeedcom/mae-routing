@@ -9,7 +9,7 @@ package healthmsg
 
 const (
 	WarnAcceptRoutesOff      = "Some peers are advertising routes but --accept-routes is false"
-	TailscaleSSHOnBut        = "Tailscale SSH enabled, but " // + ... something from caller
-	LockedOut                = "this node is locked out; it will not have connectivity until it is signed. For more info, see https://tailscale.com/s/locked-out"
-	InMemoryTailnetLockState = "Tailnet Lock state is only being stored in-memory. Set --statedir to store state on disk, which is more secure. See https://tailscale.com/kb/1226/tailnet-lock#tailnet-lock-state"
+	TailscaleSSHOnBut        = "MAE Routing SSH enabled, but " // + ... something from caller
+	LockedOut                = "this node is locked out; it will not have connectivity until it is signed. For more info, see https://routing.maesuaisystem.com/"
+	InMemoryTailnetLockState = "Tailnet Lock state is only being stored in-memory. Set --statedir to store state on disk, which is more secure. See https://routing.maesuaisystem.com/"
 )

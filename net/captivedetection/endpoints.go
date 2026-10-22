@@ -121,8 +121,7 @@ func availableEndpoints(derpMap *tailcfg.DERPMap, preferredDERPRegionID tailcfg.
 		}
 		endpoints = append(endpoints, Endpoint{u, http.StatusNoContent, "", false, Tailscale})
 	}
-	appendTailscaleEndpoint("http://controlplane.tailscale.com/generate_204")
-	appendTailscaleEndpoint("http://login.tailscale.com/generate_204")
+	_ = appendTailscaleEndpoint // MAE Routing: no calls to Tailscale-hosted endpoints
 
 	// Sort the endpoints by provider so that we can prioritize DERP nodes in the preferred region, followed by
 	// any other DERP server elsewhere, then followed by Tailscale endpoints.

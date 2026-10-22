@@ -138,7 +138,7 @@ func newUserspaceRouterAdvanced(logf logger.Logf, tunname string, netMon *netmon
 		cmd: cmd,
 
 		ipRuleFixLimiter: rate.NewLimiter(rate.Every(5*time.Second), 10),
-		ipPolicyPrefBase: 5200,
+		ipPolicyPrefBase: 5700,
 	}
 	r.interfaceV6Usable = func() bool { return interfaceV6UsableForTun(r.tunname) }
 	ec := bus.Client("router-linux")
@@ -361,7 +361,7 @@ func (r *linuxRouter) onIPRuleDeleted(table uint8, priority uint32) {
 
 	time.AfterFunc(rr.Delay()+250*time.Millisecond, func() {
 		if r.ruleRestorePending.Swap(false) && !r.closed.Load() {
-			r.logf("somebody (likely systemd-networkd) deleted ip rules; restoring Tailscale's")
+			r.logf("somebody (likely systemd-networkd) deleted ip rules; restoring MAE Routing's")
 			r.justAddIPRules()
 		}
 	})
@@ -511,7 +511,7 @@ func (r *linuxRouter) Set(cfg *router.Config) error {
 				removed = append(removed, p)
 			}
 			if len(removed) > 0 {
-				r.logf("router: removed %d stale Tailscale address(es) from %s left by a previous instance: %v", len(removed), r.tunname, removed)
+				r.logf("router: removed %d stale MAE Routing address(es) from %s left by a previous instance: %v", len(removed), r.tunname, removed)
 			}
 		}
 	}
@@ -640,7 +640,7 @@ var dockerStatefulFilteringWarnable = health.Register(&health.Warnable{
 	Code:     "docker-stateful-filtering",
 	Title:    "Docker with stateful filtering",
 	Severity: health.SeverityMedium,
-	Text:     health.StaticMessage("Stateful filtering is enabled and Docker was detected; this may prevent Docker containers on this host from resolving DNS and connecting to Tailscale nodes. See https://tailscale.com/s/stateful-docker"),
+	Text:     health.StaticMessage("Stateful filtering is enabled and Docker was detected; this may prevent Docker containers on this host from resolving DNS and connecting to MAE Routing nodes. See https://routing.maesuaisystem.com/"),
 })
 
 func (r *linuxRouter) updateStatefulFilteringWithDockerWarning(cfg *router.Config) {
@@ -1571,7 +1571,7 @@ var (
 	// stay in the 0-255 range even though linux itself supports
 	// larger numbers. (but nowadays we use netlink directly and
 	// aren't affected by the busybox binary's limitations)
-	tailscaleRouteTable = newRouteTable("tailscale", 52)
+	tailscaleRouteTable = newRouteTable("maerouting", 77)
 )
 
 // baseIPRules are the policy routing rules that Tailscale uses, when not
@@ -1979,7 +1979,7 @@ func removeOrphanedAddrsForCleanup(logf logger.Logf, cmd commandRunner, interfac
 		removed = append(removed, p)
 	}
 	if len(removed) > 0 {
-		r.logf("removed %d stale Tailscale address(es) from %s during cleanup: %v", len(removed), interfaceName, removed)
+		r.logf("removed %d stale MAE Routing address(es) from %s during cleanup: %v", len(removed), interfaceName, removed)
 	}
 }
 

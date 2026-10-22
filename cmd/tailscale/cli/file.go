@@ -49,7 +49,7 @@ func init() {
 func getFileCmd() *ffcli.Command {
 	return &ffcli.Command{
 		Name:       "file",
-		ShortUsage: "tailscale file <cp|get> ...",
+		ShortUsage: "mae-routing file <cp|get> ...",
 		ShortHelp:  "Send or receive files",
 		Subcommands: []*ffcli.Command{
 			fileCpCmd,
@@ -71,7 +71,7 @@ func (c *countingReader) Read(buf []byte) (int, error) {
 
 var fileCpCmd = &ffcli.Command{
 	Name:       "cp",
-	ShortUsage: "tailscale file cp <files...> <target>:",
+	ShortUsage: "mae-routing file cp <files...> <target>:",
 	ShortHelp:  "Copy file(s) to a host",
 	Exec:       runCp,
 	FlagSet: (func() *flag.FlagSet {
@@ -96,12 +96,12 @@ func runCp(ctx context.Context, args []string) error {
 		return runCpTargets(ctx, args)
 	}
 	if len(args) < 2 {
-		return errors.New("usage: tailscale file cp <files...> <target>:")
+		return errors.New("usage: mae-routing file cp <files...> <target>:")
 	}
 	files, target := args[:len(args)-1], args[len(args)-1]
 	target, ok := strings.CutSuffix(target, ":")
 	if !ok {
-		return fmt.Errorf("final argument to 'tailscale file cp' must end in colon")
+		return fmt.Errorf("final argument to 'mae-routing file cp' must end in colon")
 	}
 	hadBrackets := false
 	if strings.HasPrefix(target, "[") && strings.HasSuffix(target, "]") {
@@ -192,7 +192,7 @@ func runCp(ctx context.Context, args []string) error {
 			f, err := os.Open(fileArg)
 			if err != nil {
 				if version.IsSandboxedMacOS() {
-					return errors.New("the GUI version of Tailscale on macOS runs in a macOS sandbox that can't read files")
+					return errors.New("the GUI version of MAE Routing on macOS runs in a macOS sandbox that can't read files")
 				}
 				return err
 			}
@@ -472,7 +472,7 @@ peerLoop:
 	// If we didn’t find a matching peer at all:
 	if foundPeer == nil {
 		if !tsaddr.IsTailscaleIP(ip) {
-			return "", false, fmt.Errorf("unknown target; %v is not a Tailscale IP address", ip)
+			return "", false, fmt.Errorf("unknown target; %v is not a MAE Routing IP address", ip)
 		}
 		return "", false, errors.New("unknown target; not in your Tailnet")
 	}
@@ -488,7 +488,7 @@ peerLoop:
 		return "", isOffline, errors.New("cannot send files: no netmap available on this node")
 
 	case ipnstate.TaildropTargetIpnStateNotRunning:
-		return "", isOffline, errors.New("cannot send files: local Tailscale is not connected to the tailnet")
+		return "", isOffline, errors.New("cannot send files: local MAE Routing is not connected to the tailnet")
 
 	case ipnstate.TaildropTargetMissingCap:
 		return "", isOffline, errors.New("cannot send files: missing required Taildrop capability")
@@ -612,8 +612,8 @@ func (v *onConflict) Set(s string) error {
 
 var fileGetCmd = &ffcli.Command{
 	Name:       "get",
-	ShortUsage: "tailscale file get [--wait] [--verbose] [--conflict=(skip|overwrite|rename)] <target-directory>",
-	ShortHelp:  "Move files out of the Tailscale file inbox",
+	ShortUsage: "mae-routing file get [--wait] [--verbose] [--conflict=(skip|overwrite|rename)] <target-directory>",
+	ShortHelp:  "Move files out of the MAE Routing file inbox",
 	Exec:       runFileGet,
 	FlagSet: (func() *flag.FlagSet {
 		fs := newFlagSet("get")
@@ -761,7 +761,7 @@ func runFileGetOneBatch(ctx context.Context, dir string) []error {
 
 func runFileGet(ctx context.Context, args []string) error {
 	if len(args) != 1 {
-		return errors.New("usage: tailscale file get <target-directory>")
+		return errors.New("usage: mae-routing file get <target-directory>")
 	}
 	log.SetFlags(0)
 

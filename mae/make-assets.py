@@ -92,7 +92,7 @@ def winres(path, ico, desc, filename, admin=False):
         'CompanyName': 'MAE Routing (maesuaisystem.com)', 'FileDescription': desc, 'FileVersion': VERSION,
         'InternalName': filename.removesuffix('.exe'), 'OriginalFilename': filename, 'ProductName': 'MAE Routing',
         'ProductVersion': VERSION,
-        'LegalCopyright': '© 2026 MAE Routing · portions © Tailscale Inc & contributors (BSD-3-Clause)',
+        'LegalCopyright': '© 2026 MAE Routing',
     }
     data = {
         'RT_GROUP_ICON': {'APP': {'0000': ico.name}},   # go-winres resolves paths from the json's folder

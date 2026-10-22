@@ -581,9 +581,9 @@ func (c *Direct) hostInfoLocked() *tailcfg.Hostinfo {
 var macOSScreenTime = health.Register(&health.Warnable{
 	Code:     "macos-screen-time-controlclient",
 	Severity: health.SeverityHigh,
-	Title:    "Tailscale blocked by Screen Time",
+	Title:    "MAE Routing blocked by Screen Time",
 	Text: func(args health.Args) string {
-		return "macOS Screen Time seems to be blocking Tailscale. Try disabling Screen Time in System Settings > Screen Time > Content & Privacy > Access to Web Content."
+		return "macOS Screen Time seems to be blocking MAE Routing. Try disabling Screen Time in System Settings > Screen Time > Content & Privacy > Access to Web Content."
 	},
 	ImpactsConnectivity: true,
 })
@@ -661,7 +661,7 @@ func (c *Direct) doLogin(ctx context.Context, opt loginOpt) (mustRegen bool, new
 		if expired {
 			c.logf("Old key expired -> regen=true")
 			if f, ok := feature.HookSystemdStatus.GetOk(); ok {
-				f("key expired; run 'tailscale up' to authenticate")
+				f("key expired; run 'mae-routing up' to authenticate")
 			}
 			regen = true
 		}

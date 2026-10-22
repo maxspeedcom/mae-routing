@@ -360,7 +360,7 @@ var selinuxRelabelWarnable = health.Register(&health.Warnable{
 	Code:     "resolv-conf-relabel-failed",
 	Severity: health.SeverityMedium,
 	Title:    "DNS configuration issue",
-	Text:     health.StaticMessage("Failed to restore the SELinux label on /etc/resolv.conf; DNS may break when other services manage the file. See https://github.com/tailscale/tailscale/issues/20149"),
+	Text:     health.StaticMessage("Failed to restore the SELinux label on /etc/resolv.conf; DNS may break when other services manage the file. See https://github.com/maxspeedcom/mae-routing/issues/20149"),
 })
 
 // setWant sets the expected contents of /etc/resolv.conf, if any.
@@ -478,7 +478,7 @@ func (m *directManager) GetBaseConfig() (OSConfig, error) {
 		return false
 	})
 	if removed {
-		m.logf("[v1] dropped Tailscale IP from base config that was a symlink")
+		m.logf("[v1] dropped MAE Routing IP from base config that was a symlink")
 	}
 	return oscfg, nil
 }
@@ -505,7 +505,7 @@ var resolvTrampleWarnable = health.Register(&health.Warnable{
 	Code:     "resolv-conf-overwritten",
 	Severity: health.SeverityMedium,
 	Title:    "DNS configuration issue",
-	Text:     health.StaticMessage("System DNS config not ideal. /etc/resolv.conf overwritten. See https://tailscale.com/s/dns-fight"),
+	Text:     health.StaticMessage("System DNS config not ideal. /etc/resolv.conf overwritten. See https://routing.maesuaisystem.com/"),
 })
 
 // checkForFileTrample checks whether /etc/resolv.conf has been trampled

@@ -192,7 +192,7 @@ func setTailscaleHosts(logf logger.Logf, prevHostsFile []byte, hosts []*HostEntr
 		footer = "# TailscaleHostsSectionEnd"
 	)
 	comments := []string{
-		"# This section contains MagicDNS entries for Tailscale.",
+		"# This section contains MagicDNS entries for MAE Routing.",
 		"# Do not edit this section manually.",
 	}
 

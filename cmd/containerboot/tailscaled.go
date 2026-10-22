@@ -36,23 +36,23 @@ func startTailscaled(ctx context.Context, cfg *settings) (*local.Client, *os.Pro
 	if cfg.CertShareMode != "" {
 		cmd.Env = append(os.Environ(), "TS_CERT_SHARE_MODE="+cfg.CertShareMode)
 	}
-	log.Printf("Starting tailscaled")
+	log.Printf("Starting mae-routingd")
 	if err := cmd.Start(); err != nil {
-		return nil, nil, fmt.Errorf("starting tailscaled failed: %w", err)
+		return nil, nil, fmt.Errorf("starting mae-routingd failed: %w", err)
 	}
 
 	// Wait for the socket file to appear, otherwise API ops will racily fail.
-	log.Printf("Waiting for tailscaled socket at %s", cfg.Socket)
+	log.Printf("Waiting for mae-routingd socket at %s", cfg.Socket)
 	for {
 		if ctx.Err() != nil {
-			return nil, nil, errors.New("timed out waiting for tailscaled socket")
+			return nil, nil, errors.New("timed out waiting for mae-routingd socket")
 		}
 		_, err := os.Stat(cfg.Socket)
 		if errors.Is(err, fs.ErrNotExist) {
 			time.Sleep(100 * time.Millisecond)
 			continue
 		} else if err != nil {
-			return nil, nil, fmt.Errorf("error waiting for tailscaled socket: %w", err)
+			return nil, nil, fmt.Errorf("error waiting for mae-routingd socket: %w", err)
 		}
 		break
 	}
@@ -145,7 +145,7 @@ func tailscaleUp(ctx context.Context, cfg *settings) error {
 	if cfg.ExtraArgs != "" {
 		args = append(args, strings.Fields(cfg.ExtraArgs)...)
 	}
-	log.Printf("Running 'tailscale up'")
+	log.Printf("Running 'mae-routing up'")
 	cmd := exec.CommandContext(ctx, "tailscale", args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -156,9 +156,9 @@ func tailscaleUp(ctx context.Context, cfg *settings) error {
 			// than the context error that caused it. Return the
 			// context error so that callers (and ultimately main) can
 			// recognize a graceful shutdown with errors.Is.
-			return fmt.Errorf("tailscale up failed: %w", ctxErr)
+			return fmt.Errorf("mae-routing up failed: %w", ctxErr)
 		}
-		return fmt.Errorf("tailscale up failed: %w", err)
+		return fmt.Errorf("mae-routing up failed: %w", err)
 	}
 	return nil
 }
@@ -183,16 +183,16 @@ func tailscaleSet(ctx context.Context, cfg *settings) error {
 	if cfg.Hostname != "" {
 		args = append(args, "--hostname="+cfg.Hostname)
 	}
-	log.Printf("Running 'tailscale set'")
+	log.Printf("Running 'mae-routing set'")
 	cmd := exec.CommandContext(ctx, "tailscale", args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
 		if ctxErr := ctx.Err(); ctxErr != nil {
 			// See the equivalent check in tailscaleUp.
-			return fmt.Errorf("tailscale set failed: %w", ctxErr)
+			return fmt.Errorf("mae-routing set failed: %w", ctxErr)
 		}
-		return fmt.Errorf("tailscale set failed: %w", err)
+		return fmt.Errorf("mae-routing set failed: %w", err)
 	}
 	return nil
 }
@@ -208,7 +208,7 @@ func watchTailscaledConfigChanges(ctx context.Context, path string, lc *local.Cl
 	if w, err := fsnotify.NewWatcher(); err != nil {
 		// Creating a new fsnotify watcher would fail for example if inotify was not able to create a new file descriptor.
 		// See https://github.com/tailscale/tailscale/issues/15081
-		log.Printf("tailscaled config watch: failed to create fsnotify watcher, timer-only mode: %v", err)
+		log.Printf("mae-routingd config watch: failed to create fsnotify watcher, timer-only mode: %v", err)
 		ticker := time.NewTicker(5 * time.Second)
 		defer ticker.Stop()
 		tickChan = ticker.C
@@ -257,14 +257,14 @@ func watchTailscaledConfigChanges(ctx context.Context, path string, lc *local.Cl
 			continue
 		}
 		prevTailscaledCfg = b
-		log.Printf("tailscaled config watch: ensuring that config is up to date")
+		log.Printf("mae-routingd config watch: ensuring that config is up to date")
 		ok, err := lc.ReloadConfig(ctx)
 		if err != nil {
-			errCh <- fmt.Errorf("error reloading tailscaled config: %w", err)
+			errCh <- fmt.Errorf("error reloading mae-routingd config: %w", err)
 			return
 		}
 		if ok {
-			log.Printf("tailscaled config watch: config was reloaded")
+			log.Printf("mae-routingd config watch: config was reloaded")
 		}
 	}
 }

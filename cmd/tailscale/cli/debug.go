@@ -63,9 +63,9 @@ func debugCmd() *ffcli.Command {
 	return &ffcli.Command{
 		Name:       "debug",
 		Exec:       runDebug,
-		ShortUsage: "tailscale debug <debug-flags | subcommand>",
+		ShortUsage: "mae-routing debug <debug-flags | subcommand>",
 		ShortHelp:  "Debug commands",
-		LongHelp:   hidden + `"tailscale debug" contains misc debug facilities; it is not a stable interface.`,
+		LongHelp:   hidden + `"mae-routing debug" contains misc debug facilities; it is not a stable interface.`,
 		FlagSet: (func() *flag.FlagSet {
 			fs := newFlagSet("debug")
 			fs.StringVar(&debugArgs.file, "file", "", "get, delete:NAME, or NAME")
@@ -77,13 +77,13 @@ func debugCmd() *ffcli.Command {
 		Subcommands: nonNilCmds([]*ffcli.Command{
 			{
 				Name:       "derp-map",
-				ShortUsage: "tailscale debug derp-map",
+				ShortUsage: "mae-routing debug derp-map",
 				Exec:       runDERPMap,
 				ShortHelp:  "Print DERP map",
 			},
 			{
 				Name:       "component-logs",
-				ShortUsage: "tailscale debug component-logs [" + strings.Join(ipn.DebuggableComponents, "|") + "]",
+				ShortUsage: "mae-routing debug component-logs [" + strings.Join(ipn.DebuggableComponents, "|") + "]",
 				Exec:       runDebugComponentLogs,
 				ShortHelp:  "Enable/disable debug logs for a component",
 				FlagSet: (func() *flag.FlagSet {
@@ -94,15 +94,15 @@ func debugCmd() *ffcli.Command {
 			},
 			{
 				Name:       "daemon-goroutines",
-				ShortUsage: "tailscale debug daemon-goroutines",
+				ShortUsage: "mae-routing debug daemon-goroutines",
 				Exec:       runDaemonGoroutines,
-				ShortHelp:  "Print tailscaled's goroutines",
+				ShortHelp:  "Print mae-routingd's goroutines",
 			},
 			{
 				Name:       "daemon-logs",
-				ShortUsage: "tailscale debug daemon-logs",
+				ShortUsage: "mae-routing debug daemon-logs",
 				Exec:       runDaemonLogs,
-				ShortHelp:  "Watch tailscaled's server logs",
+				ShortHelp:  "Watch mae-routingd's server logs",
 				FlagSet: (func() *flag.FlagSet {
 					fs := newFlagSet("daemon-logs")
 					fs.IntVar(&daemonLogsArgs.verbose, "verbose", 0, "verbosity level")
@@ -112,15 +112,15 @@ func debugCmd() *ffcli.Command {
 			},
 			{
 				Name:       "daemon-bus-events",
-				ShortUsage: "tailscale debug daemon-bus-events",
+				ShortUsage: "mae-routing debug daemon-bus-events",
 				Exec:       runDaemonBusEvents,
-				ShortHelp:  "Watch events on the tailscaled bus",
+				ShortHelp:  "Watch events on the mae-routingd bus",
 			},
 			{
 				Name:       "daemon-bus-graph",
-				ShortUsage: "tailscale debug daemon-bus-graph",
+				ShortUsage: "mae-routing debug daemon-bus-graph",
 				Exec:       runDaemonBusGraph,
-				ShortHelp:  "Print graph for the tailscaled bus",
+				ShortHelp:  "Print graph for the mae-routingd bus",
 				FlagSet: (func() *flag.FlagSet {
 					fs := newFlagSet("debug-bus-graph")
 					fs.StringVar(&daemonBusGraphArgs.format, "format", "json", "output format [json/dot]")
@@ -129,15 +129,15 @@ func debugCmd() *ffcli.Command {
 			},
 			{
 				Name:       "daemon-bus-queues",
-				ShortUsage: "tailscale debug daemon-bus-queues",
+				ShortUsage: "mae-routing debug daemon-bus-queues",
 				Exec:       runDaemonBusQueues,
 				ShortHelp:  "Print event bus queue depths per client",
 			},
 			{
 				Name:       "metrics",
-				ShortUsage: "tailscale debug metrics",
+				ShortUsage: "mae-routing debug metrics",
 				Exec:       runDaemonMetrics,
-				ShortHelp:  "Print tailscaled's metrics",
+				ShortHelp:  "Print mae-routingd's metrics",
 				FlagSet: (func() *flag.FlagSet {
 					fs := newFlagSet("metrics")
 					fs.BoolVar(&metricsArgs.watch, "watch", false, "print JSON dump of delta values")
@@ -146,31 +146,31 @@ func debugCmd() *ffcli.Command {
 			},
 			{
 				Name:       "env",
-				ShortUsage: "tailscale debug env",
+				ShortUsage: "mae-routing debug env",
 				Exec:       runEnv,
-				ShortHelp:  "Print cmd/tailscale environment",
+				ShortHelp:  "Print mae-routing environment",
 			},
 			{
 				Name:       "stat",
-				ShortUsage: "tailscale debug stat <files...>",
+				ShortUsage: "mae-routing debug stat <files...>",
 				Exec:       runStat,
 				ShortHelp:  "Stat a file",
 			},
 			{
 				Name:       "hostinfo",
-				ShortUsage: "tailscale debug hostinfo",
+				ShortUsage: "mae-routing debug hostinfo",
 				Exec:       runHostinfo,
 				ShortHelp:  "Print hostinfo",
 			},
 			{
 				Name:       "local-creds",
-				ShortUsage: "tailscale debug local-creds",
+				ShortUsage: "mae-routing debug local-creds",
 				Exec:       runLocalCreds,
-				ShortHelp:  "Print how to access Tailscale LocalAPI",
+				ShortHelp:  "Print how to access MAE Routing LocalAPI",
 			},
 			{
 				Name:       "localapi",
-				ShortUsage: "tailscale debug localapi [<method>] <path> [<body| \"-\">]",
+				ShortUsage: "mae-routing debug localapi [<method>] <path> [<body| \"-\">]",
 				Exec:       runLocalAPI,
 				ShortHelp:  "Call a LocalAPI method directly",
 				FlagSet: (func() *flag.FlagSet {
@@ -181,80 +181,80 @@ func debugCmd() *ffcli.Command {
 			},
 			{
 				Name:       "restun",
-				ShortUsage: "tailscale debug restun",
+				ShortUsage: "mae-routing debug restun",
 				Exec:       localAPIAction("restun"),
 				ShortHelp:  "Force a magicsock restun",
 			},
 			{
 				Name:       "rebind",
-				ShortUsage: "tailscale debug rebind",
+				ShortUsage: "mae-routing debug rebind",
 				Exec:       localAPIAction("rebind"),
 				ShortHelp:  "Force a magicsock rebind",
 			},
 			{
 				Name:       "rotate-disco-key",
-				ShortUsage: "tailscale debug rotate-disco-key",
+				ShortUsage: "mae-routing debug rotate-disco-key",
 				Exec:       localAPIAction("rotate-disco-key"),
 				ShortHelp:  "Rotate the discovery key",
 			},
 			{
 				Name:       "derp-set-on-demand",
-				ShortUsage: "tailscale debug derp-set-on-demand",
+				ShortUsage: "mae-routing debug derp-set-on-demand",
 				Exec:       localAPIAction("derp-set-homeless"),
 				ShortHelp:  "Enable DERP on-demand mode (breaks reachability)",
 			},
 			{
 				Name:       "derp-unset-on-demand",
-				ShortUsage: "tailscale debug derp-unset-on-demand",
+				ShortUsage: "mae-routing debug derp-unset-on-demand",
 				Exec:       localAPIAction("derp-unset-homeless"),
 				ShortHelp:  "Disable DERP on-demand mode",
 			},
 			{
 				Name:       "break-tcp-conns",
-				ShortUsage: "tailscale debug break-tcp-conns",
+				ShortUsage: "mae-routing debug break-tcp-conns",
 				Exec:       localAPIAction("break-tcp-conns"),
 				ShortHelp:  "Break any open TCP connections from the daemon",
 			},
 			{
 				Name:       "break-derp-conns",
-				ShortUsage: "tailscale debug break-derp-conns",
+				ShortUsage: "mae-routing debug break-derp-conns",
 				Exec:       localAPIAction("break-derp-conns"),
 				ShortHelp:  "Break any open DERP connections from the daemon",
 			},
 			{
 				Name:       "pick-new-derp",
-				ShortUsage: "tailscale debug pick-new-derp",
+				ShortUsage: "mae-routing debug pick-new-derp",
 				Exec:       localAPIAction("pick-new-derp"),
 				ShortHelp:  "Switch to some other random DERP home region for a short time",
 			},
 			{
 				Name:       "force-prefer-derp",
-				ShortUsage: "tailscale debug force-prefer-derp",
+				ShortUsage: "mae-routing debug force-prefer-derp",
 				Exec:       forcePreferDERP,
 				ShortHelp:  "Prefer the given region ID if reachable (until restart, or 0 to clear)",
 			},
 			{
 				Name:       "force-netmap-update",
-				ShortUsage: "tailscale debug force-netmap-update",
+				ShortUsage: "mae-routing debug force-netmap-update",
 				Exec:       localAPIAction("force-netmap-update"),
 				ShortHelp:  "Force a full no-op netmap update (for load testing)",
 			},
 			{
 				// TODO(bradfitz,maisem): eventually promote this out of debug
 				Name:       "reload-config",
-				ShortUsage: "tailscale debug reload-config",
+				ShortUsage: "mae-routing debug reload-config",
 				Exec:       reloadConfig,
 				ShortHelp:  "Reload config",
 			},
 			{
 				Name:       "control-knobs",
-				ShortUsage: "tailscale debug control-knobs",
+				ShortUsage: "mae-routing debug control-knobs",
 				Exec:       debugControlKnobs,
 				ShortHelp:  "See current control knobs",
 			},
 			{
 				Name:       "prefs",
-				ShortUsage: "tailscale debug prefs",
+				ShortUsage: "mae-routing debug prefs",
 				Exec:       runPrefs,
 				ShortHelp:  "Print prefs",
 				FlagSet: (func() *flag.FlagSet {
@@ -265,7 +265,7 @@ func debugCmd() *ffcli.Command {
 			},
 			{
 				Name:       "watch-ipn",
-				ShortUsage: "tailscale debug watch-ipn",
+				ShortUsage: "mae-routing debug watch-ipn",
 				Exec:       runWatchIPN,
 				ShortHelp:  "Subscribe to IPN message bus",
 				FlagSet: (func() *flag.FlagSet {
@@ -288,7 +288,7 @@ func debugCmd() *ffcli.Command {
 			},
 			{
 				Name:       "netmap",
-				ShortUsage: "tailscale debug netmap",
+				ShortUsage: "mae-routing debug netmap",
 				Exec:       runNetmap,
 				ShortHelp:  "Print the current network map",
 				FlagSet: (func() *flag.FlagSet {
@@ -298,14 +298,14 @@ func debugCmd() *ffcli.Command {
 			},
 			{
 				Name: "via",
-				ShortUsage: "tailscale debug via <site-id> <v4-cidr>\n" +
-					"tailscale debug via <v6-route>",
+				ShortUsage: "mae-routing debug via <site-id> <v4-cidr>\n" +
+					"mae-routing debug via <v6-route>",
 				Exec:      runVia,
 				ShortHelp: "Convert between site-specific IPv4 CIDRs and IPv6 'via' routes",
 			},
 			{
 				Name:       "ts2021",
-				ShortUsage: "tailscale debug ts2021",
+				ShortUsage: "mae-routing debug ts2021",
 				Exec:       runTS2021,
 				ShortHelp:  "Debug ts2021 protocol connectivity",
 				FlagSet: (func() *flag.FlagSet {
@@ -322,7 +322,7 @@ func debugCmd() *ffcli.Command {
 			},
 			{
 				Name:       "set-expire",
-				ShortUsage: "tailscale debug set-expire --in=1m",
+				ShortUsage: "mae-routing debug set-expire --in=1m",
 				Exec:       runSetExpire,
 				ShortHelp:  "Manipulate node key expiry for testing",
 				FlagSet: (func() *flag.FlagSet {
@@ -333,7 +333,7 @@ func debugCmd() *ffcli.Command {
 			},
 			{
 				Name:       "dev-store-set",
-				ShortUsage: "tailscale debug dev-store-set",
+				ShortUsage: "mae-routing debug dev-store-set",
 				Exec:       runDevStoreSet,
 				ShortHelp:  "Set a key/value pair during development",
 				FlagSet: (func() *flag.FlagSet {
@@ -344,7 +344,7 @@ func debugCmd() *ffcli.Command {
 			},
 			{
 				Name:       "derp",
-				ShortUsage: "tailscale debug derp",
+				ShortUsage: "mae-routing debug derp",
 				Exec:       runDebugDERP,
 				ShortHelp:  "Test a DERP configuration",
 			},
@@ -352,13 +352,13 @@ func debugCmd() *ffcli.Command {
 			ccall(debugPortmapCmd),
 			{
 				Name:       "peer-endpoint-changes",
-				ShortUsage: "tailscale debug peer-endpoint-changes <hostname-or-IP>",
+				ShortUsage: "mae-routing debug peer-endpoint-changes <hostname-or-IP>",
 				Exec:       runPeerEndpointChanges,
 				ShortHelp:  "Print debug information about a peer's endpoint changes",
 			},
 			{
 				Name:       "dial-types",
-				ShortUsage: "tailscale debug dial-types <hostname-or-IP> <port>",
+				ShortUsage: "mae-routing debug dial-types <hostname-or-IP> <port>",
 				Exec:       runDebugDialTypes,
 				ShortHelp:  "Print debug information about connecting to a given host or IP",
 				FlagSet: (func() *flag.FlagSet {
@@ -369,7 +369,7 @@ func debugCmd() *ffcli.Command {
 			},
 			{
 				Name:       "resolve",
-				ShortUsage: "tailscale debug resolve <hostname>",
+				ShortUsage: "mae-routing debug resolve <hostname>",
 				Exec:       runDebugResolve,
 				ShortHelp:  "Does a DNS lookup",
 				FlagSet: (func() *flag.FlagSet {
@@ -380,19 +380,19 @@ func debugCmd() *ffcli.Command {
 			},
 			{
 				Name:       "go-buildinfo",
-				ShortUsage: "tailscale debug go-buildinfo",
+				ShortUsage: "mae-routing debug go-buildinfo",
 				ShortHelp:  "Print Go's runtime/debug.BuildInfo",
 				Exec:       runGoBuildInfo,
 			},
 			{
 				Name:       "peer-relay-servers",
-				ShortUsage: "tailscale debug peer-relay-servers",
+				ShortUsage: "mae-routing debug peer-relay-servers",
 				ShortHelp:  "Print the current set of candidate peer relay servers",
 				Exec:       runPeerRelayServers,
 			},
 			{
 				Name:       "test-risk",
-				ShortUsage: "tailscale debug test-risk",
+				ShortUsage: "mae-routing debug test-risk",
 				ShortHelp:  "Do a fake risky action",
 				Exec:       runTestRisk,
 				FlagSet: (func() *flag.FlagSet {
@@ -403,7 +403,7 @@ func debugCmd() *ffcli.Command {
 			},
 			{
 				Name:       "statedir",
-				ShortUsage: "tailscale debug statedir",
+				ShortUsage: "mae-routing debug statedir",
 				ShortHelp:  "Print the location of the state directory (if any)",
 				Exec:       runPrintStateDir,
 			},
@@ -450,7 +450,7 @@ func outName(dst string) string {
 
 func runDebug(ctx context.Context, args []string) error {
 	if len(args) > 0 {
-		return fmt.Errorf("tailscale debug: unknown subcommand: %s", args[0])
+		return fmt.Errorf("mae-routing debug: unknown subcommand: %s", args[0])
 	}
 	var usedFlag bool
 	if out := debugArgs.cpuFile; out != "" {
@@ -505,7 +505,7 @@ func runDebug(ctx context.Context, args []string) error {
 		// to subcommands.
 		return nil
 	}
-	return errors.New("tailscale debug: subcommand or flag required")
+	return errors.New("mae-routing debug: subcommand or flag required")
 }
 
 func runLocalCreds(ctx context.Context, args []string) error {
@@ -1242,7 +1242,7 @@ var debugComponentLogsArgs struct {
 
 func runDebugComponentLogs(ctx context.Context, args []string) error {
 	if len(args) != 1 {
-		return errors.New("usage: tailscale debug component-logs [" + strings.Join(ipn.DebuggableComponents, "|") + "]")
+		return errors.New("usage: mae-routing debug component-logs [" + strings.Join(ipn.DebuggableComponents, "|") + "]")
 	}
 	component := args[0]
 	dur := debugComponentLogsArgs.forDur
@@ -1265,7 +1265,7 @@ var devStoreSetArgs struct {
 
 func runDevStoreSet(ctx context.Context, args []string) error {
 	if len(args) != 2 {
-		return errors.New("usage: tailscale debug dev-store-set --danger <key> <value>")
+		return errors.New("usage: mae-routing debug dev-store-set --danger <key> <value>")
 	}
 	if !devStoreSetArgs.danger {
 		return errors.New("this command is dangerous; use --danger to proceed")
@@ -1283,7 +1283,7 @@ func runDevStoreSet(ctx context.Context, args []string) error {
 
 func runDebugDERP(ctx context.Context, args []string) error {
 	if len(args) != 1 {
-		return errors.New("usage: tailscale debug derp <region>")
+		return errors.New("usage: mae-routing debug derp <region>")
 	}
 	st, err := localClient.DebugDERPRegion(ctx, args[0])
 	if err != nil {
@@ -1299,7 +1299,7 @@ var setExpireArgs struct {
 
 func runSetExpire(ctx context.Context, args []string) error {
 	if len(args) != 0 || setExpireArgs.in == 0 {
-		return errors.New("usage: tailscale debug set-expire --in=<duration>")
+		return errors.New("usage: mae-routing debug set-expire --in=<duration>")
 	}
 	return localClient.DebugSetExpireIn(ctx, setExpireArgs.in)
 }
@@ -1316,7 +1316,7 @@ func runPeerEndpointChanges(ctx context.Context, args []string) error {
 	}
 
 	if len(args) != 1 || args[0] == "" {
-		return errors.New("usage: tailscale debug peer-endpoint-changes <hostname-or-IP>")
+		return errors.New("usage: mae-routing debug peer-endpoint-changes <hostname-or-IP>")
 	}
 	var ip string
 
@@ -1326,7 +1326,7 @@ func runPeerEndpointChanges(ctx context.Context, args []string) error {
 		return err
 	}
 	if self {
-		printf("%v is local Tailscale IP\n", ip)
+		printf("%v is local MAE Routing IP\n", ip)
 		return nil
 	}
 
@@ -1392,7 +1392,7 @@ func runDebugDialTypes(ctx context.Context, args []string) error {
 	}
 
 	if len(args) != 2 || args[0] == "" || args[1] == "" {
-		return errors.New("usage: tailscale debug dial-types <hostname-or-IP> <port>")
+		return errors.New("usage: mae-routing debug dial-types <hostname-or-IP> <port>")
 	}
 
 	port, err := strconv.ParseUint(args[1], 10, 16)
@@ -1440,7 +1440,7 @@ var resolveArgs struct {
 
 func runDebugResolve(ctx context.Context, args []string) error {
 	if len(args) != 1 {
-		return errors.New("usage: tailscale debug resolve <hostname>")
+		return errors.New("usage: mae-routing debug resolve <hostname>")
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)

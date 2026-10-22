@@ -160,7 +160,7 @@ func (m openresolvManager) GetBaseConfig() (OSConfig, error) {
 		return false
 	})
 	if removed {
-		m.logf("[v1] dropped Tailscale service IP from openresolv base config")
+		m.logf("[v1] dropped MAE Routing service IP from openresolv base config")
 	}
 	return cfg, nil
 }

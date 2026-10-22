@@ -42,7 +42,7 @@ func synologyConfigureCertCmd() *ffcli.Command {
 This command is intended to run periodically as root on a Synology device to
 create or refresh the TLS certificate for the tailnet domain.
 
-See: https://tailscale.com/kb/1153/enabling-https
+See: https://routing.maesuaisystem.com/
 `),
 		FlagSet: (func() *flag.FlagSet {
 			fs := newFlagSet("synology-cert")
@@ -76,7 +76,7 @@ func runConfigureSynologyCert(ctx context.Context, args []string) error {
 	domain := synologyConfigureCertArgs.domain
 	if st, err := localClient.Status(ctx); err == nil {
 		if st.BackendState != ipn.Running.String() {
-			return fmt.Errorf("Tailscale is not running.")
+			return fmt.Errorf("MAE Routing is not running.")
 		} else if len(st.CertDomains) == 0 {
 			return fmt.Errorf("TLS certificate support is not enabled/configured for your tailnet.")
 		} else if len(st.CertDomains) == 1 {

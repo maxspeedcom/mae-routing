@@ -32,11 +32,11 @@ const darwinLaunchdPlist = `
 <dict>
 
   <key>Label</key>
-  <string>com.tailscale.tailscaled</string>
+  <string>com.tailscale.mae-routingd</string>
 
   <key>ProgramArguments</key>
   <array>
-    <string>/usr/local/bin/tailscaled</string>
+    <string>/usr/local/bin/mae-routingd</string>
   </array>
 
   <key>RunAtLoad</key>
@@ -62,7 +62,7 @@ func uninstallSystemDaemonDarwin(args []string) (ret error) {
 	if running {
 		out, err := exec.Command("launchctl", "stop", "com.tailscale.tailscaled").CombinedOutput()
 		if err != nil {
-			fmt.Printf("launchctl stop com.tailscale.tailscaled: %v, %s\n", err, out)
+			fmt.Printf("launchctl stop com.tailscale.mae-routingd: %v, %s\n", err, out)
 			ret = err
 		}
 		out, err = exec.Command("launchctl", "unload", sysPlist).CombinedOutput()
@@ -106,7 +106,7 @@ func installSystemDaemonDarwin(args []string) (err error) {
 	}
 	defer func() {
 		if err != nil && os.Getuid() != 0 {
-			err = fmt.Errorf("%w; try running tailscaled with sudo", err)
+			err = fmt.Errorf("%w; try running mae-routingd with sudo", err)
 		}
 	}()
 

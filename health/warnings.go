@@ -34,7 +34,7 @@ var updateAvailableWarnable = condRegister(func() *Warnable {
 			if version.IsMacAppStore() || version.IsAppleTV() || version.IsMacSys() || version.IsWindowsGUI() || runtime.GOOS == "android" {
 				return fmt.Sprintf("An update from version %s to %s is available.", args[ArgCurrentVersion], args[ArgAvailableVersion])
 			} else {
-				return fmt.Sprintf("An update from version %s to %s is available. Run `tailscale update` or `tailscale set --auto-update` to update now.", args[ArgCurrentVersion], args[ArgAvailableVersion])
+				return fmt.Sprintf("An update from version %s to %s is available. Run `mae-routing update` or `mae-routing set --auto-update` to update now.", args[ArgCurrentVersion], args[ArgAvailableVersion])
 			}
 		},
 	}
@@ -50,7 +50,7 @@ var securityUpdateAvailableWarnable = condRegister(func() *Warnable {
 			if version.IsMacAppStore() || version.IsAppleTV() || version.IsMacSys() || version.IsWindowsGUI() || runtime.GOOS == "android" {
 				return fmt.Sprintf("A security update from version %s to %s is available.", args[ArgCurrentVersion], args[ArgAvailableVersion])
 			} else {
-				return fmt.Sprintf("A security update from version %s to %s is available. Run `tailscale update` or `tailscale set --auto-update` to update now.", args[ArgCurrentVersion], args[ArgAvailableVersion])
+				return fmt.Sprintf("A security update from version %s to %s is available. Run `mae-routing update` or `mae-routing set --auto-update` to update now.", args[ArgCurrentVersion], args[ArgAvailableVersion])
 			}
 		},
 	}
@@ -63,7 +63,7 @@ var unstableWarnable = condRegister(func() *Warnable {
 		Code:     tsconst.HealthWarnableIsUsingUnstableVersion,
 		Title:    "Using an unstable version",
 		Severity: SeverityLow,
-		Text:     StaticMessage("This is an unstable version of Tailscale meant for testing and development purposes. Please report any issues to Tailscale."),
+		Text:     StaticMessage("This is an unstable version of MAE Routing meant for testing and development purposes. Please report any issues to MAE Routing."),
 	}
 })
 
@@ -73,7 +73,7 @@ var NetworkStatusWarnable = condRegister(func() *Warnable {
 		Code:                tsconst.HealthWarnableNetworkStatus,
 		Title:               "Network down",
 		Severity:            SeverityMedium,
-		Text:                StaticMessage("Tailscale cannot connect because the network is down. Check your Internet connection."),
+		Text:                StaticMessage("MAE Routing cannot connect because the network is down. Check your Internet connection."),
 		ImpactsConnectivity: true,
 		TimeToVisible:       5 * time.Second,
 	}
@@ -83,9 +83,9 @@ var NetworkStatusWarnable = condRegister(func() *Warnable {
 var IPNStateWarnable = condRegister(func() *Warnable {
 	return &Warnable{
 		Code:     tsconst.HealthWarnableWantRunningFalse,
-		Title:    "Tailscale off",
+		Title:    "MAE Routing off",
 		Severity: SeverityLow,
-		Text:     StaticMessage("Tailscale is stopped."),
+		Text:     StaticMessage("MAE Routing is stopped."),
 	}
 })
 
@@ -126,7 +126,7 @@ var notInMapPollWarnable = condRegister(func() *Warnable {
 		Title:     "Out of sync",
 		Severity:  SeverityMedium,
 		DependsOn: []*Warnable{NetworkStatusWarnable, IPNStateWarnable},
-		Text:      StaticMessage("Unable to connect to the Tailscale coordination server to synchronize the state of your tailnet. Peer reachability might degrade over time."),
+		Text:      StaticMessage("Unable to connect to the MAE Routing coordination server to synchronize the state of your tailnet. Peer reachability might degrade over time."),
 		// 8 minutes reflects a maximum maintenance window for the coordination server.
 		TimeToVisible: 8 * time.Minute,
 	}
@@ -139,7 +139,7 @@ var noDERPHomeWarnable = condRegister(func() *Warnable {
 		Title:               "No home relay server",
 		Severity:            SeverityMedium,
 		DependsOn:           []*Warnable{NetworkStatusWarnable},
-		Text:                StaticMessage("Tailscale could not connect to any relay server. Check your Internet connection."),
+		Text:                StaticMessage("MAE Routing could not connect to any relay server. Check your Internet connection."),
 		ImpactsConnectivity: true,
 		TimeToVisible:       10 * time.Second,
 	}
@@ -164,9 +164,9 @@ var noDERPConnectionWarnable = condRegister(func() *Warnable {
 		},
 		Text: func(args Args) string {
 			if n := args[ArgDERPRegionName]; n != "" {
-				return fmt.Sprintf("Tailscale could not connect to the '%s' relay server. Your Internet connection might be down, or the server might be temporarily unavailable.", n)
+				return fmt.Sprintf("MAE Routing could not connect to the '%s' relay server. Your Internet connection might be down, or the server might be temporarily unavailable.", n)
 			} else {
-				return fmt.Sprintf("Tailscale could not connect to the relay server with ID '%s'. Your Internet connection might be down, or the server might be temporarily unavailable.", args[ArgDERPRegionID])
+				return fmt.Sprintf("MAE Routing could not connect to the relay server with ID '%s'. Your Internet connection might be down, or the server might be temporarily unavailable.", args[ArgDERPRegionID])
 			}
 		},
 		ImpactsConnectivity: true,
@@ -188,9 +188,9 @@ var derpTimeoutWarnable = condRegister(func() *Warnable {
 		},
 		Text: func(args Args) string {
 			if n := args[ArgDERPRegionName]; n != "" {
-				return fmt.Sprintf("Tailscale hasn't heard from the '%s' relay server in %v. The server might be temporarily unavailable, or your Internet connection might be down.", n, args[ArgDuration])
+				return fmt.Sprintf("MAE Routing hasn't heard from the '%s' relay server in %v. The server might be temporarily unavailable, or your Internet connection might be down.", n, args[ArgDuration])
 			} else {
-				return fmt.Sprintf("Tailscale hasn't heard from the home relay server (region ID '%v') in %v. The server might be temporarily unavailable, or your Internet connection might be down.", args[ArgDERPRegionID], args[ArgDuration])
+				return fmt.Sprintf("MAE Routing hasn't heard from the home relay server (region ID '%v') in %v. The server might be temporarily unavailable, or your Internet connection might be down.", args[ArgDERPRegionID], args[ArgDuration])
 			}
 		},
 	}
@@ -216,7 +216,7 @@ var noUDP4BindWarnable = condRegister(func() *Warnable {
 		Title:               "NAT traversal setup failure",
 		Severity:            SeverityMedium,
 		DependsOn:           []*Warnable{NetworkStatusWarnable, IPNStateWarnable},
-		Text:                StaticMessage("Tailscale couldn't listen for incoming UDP connections."),
+		Text:                StaticMessage("MAE Routing couldn't listen for incoming UDP connections."),
 		ImpactsConnectivity: true,
 	}
 })
@@ -229,7 +229,7 @@ var mapResponseTimeoutWarnable = condRegister(func() *Warnable {
 		Severity:  SeverityMedium,
 		DependsOn: []*Warnable{NetworkStatusWarnable, IPNStateWarnable},
 		Text: func(args Args) string {
-			return fmt.Sprintf("Tailscale hasn't received a network map from the coordination server in %s.", args[ArgDuration])
+			return fmt.Sprintf("MAE Routing hasn't received a network map from the coordination server in %s.", args[ArgDuration])
 		},
 	}
 })
@@ -242,7 +242,7 @@ var tlsConnectionFailedWarnable = condRegister(func() *Warnable {
 		Severity:  SeverityMedium,
 		DependsOn: []*Warnable{NetworkStatusWarnable},
 		Text: func(args Args) string {
-			return fmt.Sprintf("Tailscale could not establish an encrypted connection with '%q': %v", args[ArgServerName], args[ArgError])
+			return fmt.Sprintf("MAE Routing could not establish an encrypted connection with '%q': %v", args[ArgServerName], args[ArgError])
 		},
 	}
 })
@@ -278,7 +278,7 @@ var applyDiskConfigWarnable = condRegister(func() *Warnable {
 		Title:    "Could not apply configuration",
 		Severity: SeverityMedium,
 		Text: func(args Args) string {
-			return fmt.Sprintf("An error occurred applying the Tailscale envknob configuration stored on disk: %v", args[ArgError])
+			return fmt.Sprintf("An error occurred applying the MAE Routing envknob configuration stored on disk: %v", args[ArgError])
 		},
 	}
 })
@@ -293,9 +293,9 @@ const warmingUpWarnableDuration = 5 * time.Second
 var warmingUpWarnable = condRegister(func() *Warnable {
 	return &Warnable{
 		Code:     tsconst.HealthWarnableWarmingUp,
-		Title:    "Tailscale is starting",
+		Title:    "MAE Routing is starting",
 		Severity: SeverityLow,
-		Text:     StaticMessage("Tailscale is starting. Please wait."),
+		Text:     StaticMessage("MAE Routing is starting. Please wait."),
 	}
 })
 

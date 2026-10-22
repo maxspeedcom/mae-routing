@@ -264,7 +264,7 @@ func ensureIngressRulesAdded(cfgs map[string]ingressservices.Config, nfr linuxfw
 }
 
 func addDNATRuleForSvc(nfr linuxfw.NetfilterRunner, serviceName string, tsIP, clusterIP netip.Addr) error {
-	log.Printf("adding DNAT rule for Tailscale Service %s with IP %s to Kubernetes Service IP %s", serviceName, tsIP, clusterIP)
+	log.Printf("adding DNAT rule for MAE Routing Service %s with IP %s to Kubernetes Service IP %s", serviceName, tsIP, clusterIP)
 	if err := nfr.EnsureDNATRuleForSvc(serviceName, tsIP, clusterIP); err != nil {
 		return err
 	}
@@ -292,7 +292,7 @@ func ensureIngressRulesDeleted(cfgs map[string]ingressservices.Config, nfr linux
 }
 
 func deleteDNATRuleForSvc(nfr linuxfw.NetfilterRunner, serviceName string, tsIP, clusterIP netip.Addr) error {
-	log.Printf("deleting DNAT rule for Tailscale Service %s with IP %s to Kubernetes Service IP %s", serviceName, tsIP, clusterIP)
+	log.Printf("deleting DNAT rule for MAE Routing Service %s with IP %s to Kubernetes Service IP %s", serviceName, tsIP, clusterIP)
 	return nfr.DeleteDNATRuleForSvc(serviceName, tsIP, clusterIP)
 }
 

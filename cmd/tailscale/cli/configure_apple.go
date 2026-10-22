@@ -26,31 +26,31 @@ func init() {
 func sysExtCmd() *ffcli.Command {
 	return &ffcli.Command{
 		Name:       "sysext",
-		ShortUsage: "tailscale configure sysext [activate|deactivate|status]",
+		ShortUsage: "mae-routing configure sysext [activate|deactivate|status]",
 		ShortHelp:  "Manage the system extension for macOS (Standalone variant)",
-		LongHelp: "The sysext set of commands provides a way to activate, deactivate, or manage the state of the Tailscale system extension on macOS. " +
-			"This is only relevant if you are running the Standalone variant of the Tailscale client for macOS. " +
+		LongHelp: "The sysext set of commands provides a way to activate, deactivate, or manage the state of the MAE Routing system extension on macOS. " +
+			"This is only relevant if you are running the Standalone variant of the MAE Routing client for macOS. " +
 			"To access more detailed information about system extensions installed on this Mac, run 'systemextensionsctl list'.",
 		Subcommands: []*ffcli.Command{
 			{
 				Name:       "activate",
-				ShortUsage: "tailscale configure sysext activate",
-				ShortHelp:  "Register the Tailscale system extension with macOS.",
-				LongHelp:   "This command registers the Tailscale system extension with macOS. To run Tailscale, you'll also need to install the VPN configuration separately (run `tailscale configure vpn-config install`). After running this command, you need to approve the extension in System Settings > Login Items and Extensions > Network Extensions.",
+				ShortUsage: "mae-routing configure sysext activate",
+				ShortHelp:  "Register the MAE Routing system extension with macOS.",
+				LongHelp:   "This command registers the MAE Routing system extension with macOS. To run MAE Routing, you'll also need to install the VPN configuration separately (run `mae-routing configure vpn-config install`). After running this command, you need to approve the extension in System Settings > Login Items and Extensions > Network Extensions.",
 				Exec:       requiresStandalone,
 			},
 			{
 				Name:       "deactivate",
-				ShortUsage: "tailscale configure sysext deactivate",
-				ShortHelp:  "Deactivate the Tailscale system extension on macOS",
-				LongHelp:   "This command deactivates the Tailscale system extension on macOS. To completely remove Tailscale, you'll also need to delete the VPN configuration separately (use `tailscale configure vpn-config uninstall`).",
+				ShortUsage: "mae-routing configure sysext deactivate",
+				ShortHelp:  "Deactivate the MAE Routing system extension on macOS",
+				LongHelp:   "This command deactivates the MAE Routing system extension on macOS. To completely remove MAE Routing, you'll also need to delete the VPN configuration separately (use `mae-routing configure vpn-config uninstall`).",
 				Exec:       requiresStandalone,
 			},
 			{
 				Name:       "status",
-				ShortUsage: "tailscale configure sysext status",
-				ShortHelp:  "Print the enablement status of the Tailscale system extension",
-				LongHelp:   "This command prints the enablement status of the Tailscale system extension. If the extension is not enabled, run `tailscale sysext activate` to enable it.",
+				ShortUsage: "mae-routing configure sysext status",
+				ShortHelp:  "Print the enablement status of the MAE Routing system extension",
+				LongHelp:   "This command prints the enablement status of the MAE Routing system extension. If the extension is not enabled, run `mae-routing sysext activate` to enable it.",
 				Exec:       requiresStandalone,
 			},
 		},
@@ -63,22 +63,22 @@ func sysExtCmd() *ffcli.Command {
 func vpnConfigCmd() *ffcli.Command {
 	return &ffcli.Command{
 		Name:       "mac-vpn",
-		ShortUsage: "tailscale configure mac-vpn [install|uninstall]",
+		ShortUsage: "mae-routing configure mac-vpn [install|uninstall]",
 		ShortHelp:  "Manage the VPN configuration on macOS (App Store and Standalone variants)",
-		LongHelp:   "The vpn-config set of commands provides a way to add or remove the Tailscale VPN configuration from the macOS settings. This is the entry that appears in System Settings > VPN.",
+		LongHelp:   "The vpn-config set of commands provides a way to add or remove the MAE Routing VPN configuration from the macOS settings. This is the entry that appears in System Settings > VPN.",
 		Subcommands: []*ffcli.Command{
 			{
 				Name:       "install",
-				ShortUsage: "tailscale configure mac-vpn install",
-				ShortHelp:  "Write the Tailscale VPN configuration to the macOS settings",
-				LongHelp:   "This command writes the Tailscale VPN configuration to the macOS settings. This is the entry that appears in System Settings > VPN. If you are running the Standalone variant of the client, you'll also need to install the system extension separately (run `tailscale configure sysext activate`).",
+				ShortUsage: "mae-routing configure mac-vpn install",
+				ShortHelp:  "Write the MAE Routing VPN configuration to the macOS settings",
+				LongHelp:   "This command writes the MAE Routing VPN configuration to the macOS settings. This is the entry that appears in System Settings > VPN. If you are running the Standalone variant of the client, you'll also need to install the system extension separately (run `mae-routing configure sysext activate`).",
 				Exec:       requiresGUI,
 			},
 			{
 				Name:       "uninstall",
-				ShortUsage: "tailscale configure mac-vpn uninstall",
-				ShortHelp:  "Delete the Tailscale VPN configuration from the macOS settings",
-				LongHelp:   "This command removes the Tailscale VPN configuration from the macOS settings. This is the entry that appears in System Settings > VPN. If you are running the Standalone variant of the client, you'll also need to deactivate the system extension separately (run `tailscale configure sysext deactivate`).",
+				ShortUsage: "mae-routing configure mac-vpn uninstall",
+				ShortHelp:  "Delete the MAE Routing VPN configuration from the macOS settings",
+				LongHelp:   "This command removes the MAE Routing VPN configuration from the macOS settings. This is the entry that appears in System Settings > VPN. If you are running the Standalone variant of the client, you'll also need to deactivate the system extension separately (run `mae-routing configure sysext deactivate`).",
 				Exec:       requiresGUI,
 			},
 		},

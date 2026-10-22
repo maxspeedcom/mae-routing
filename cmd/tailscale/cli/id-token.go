@@ -13,18 +13,18 @@ import (
 
 var idTokenCmd = &ffcli.Command{
 	Name:       "id-token",
-	ShortUsage: "tailscale id-token <aud>",
-	ShortHelp:  "Fetch an OIDC id-token for the Tailscale machine",
+	ShortUsage: "mae-routing id-token <aud>",
+	ShortHelp:  "Fetch an OIDC id-token for the MAE Routing machine",
 	LongHelp:   hidden,
 	Exec:       runIDToken,
 }
 
 func runIDToken(ctx context.Context, args []string) error {
 	if !envknob.UseWIPCode() {
-		return errors.New("tailscale id-token: works-in-progress require TAILSCALE_USE_WIP_CODE=1 envvar")
+		return errors.New("mae-routing id-token: works-in-progress require TAILSCALE_USE_WIP_CODE=1 envvar")
 	}
 	if len(args) != 1 {
-		return errors.New("usage: tailscale id-token <aud>")
+		return errors.New("usage: mae-routing id-token <aud>")
 	}
 
 	tr, err := localClient.IDToken(ctx, args[0])

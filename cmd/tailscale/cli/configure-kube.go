@@ -33,14 +33,14 @@ var configureKubeconfigArgs struct {
 func configureKubeconfigCmd() *ffcli.Command {
 	return &ffcli.Command{
 		Name:       "kubeconfig",
-		ShortHelp:  "[ALPHA] Connect to a Kubernetes cluster using a Tailscale Auth Proxy",
-		ShortUsage: "tailscale configure kubeconfig <hostname-or-fqdn>",
+		ShortHelp:  "[ALPHA] Connect to a Kubernetes cluster using a MAE Routing Auth Proxy",
+		ShortUsage: "mae-routing configure kubeconfig <hostname-or-fqdn>",
 		LongHelp: strings.TrimSpace(`
-Run this command to configure kubectl to connect to a Kubernetes cluster over Tailscale.
+Run this command to configure kubectl to connect to a Kubernetes cluster over MAE Routing.
 
-The hostname argument should be set to the Tailscale hostname of the peer running as an auth proxy in the cluster.
+The hostname argument should be set to the MAE Routing hostname of the peer running as an auth proxy in the cluster.
 
-See: https://tailscale.com/s/k8s-auth-proxy
+See: https://routing.maesuaisystem.com/
 `),
 		FlagSet: (func() *flag.FlagSet {
 			fs := newFlagSet("kubeconfig")
@@ -136,7 +136,7 @@ func isWritable(path string) error {
 // guidance when the process is sandboxed.
 func kubeconfigAccessErr(path string, err error) error {
 	if version.IsSandboxedMacOS() {
-		return fmt.Errorf("cannot write kubeconfig at %q: %w; GUI builds of the macOS client run in a sandbox and can only access files under your home directory, use the open-source tailscaled distribution for other locations", path, err)
+		return fmt.Errorf("cannot write kubeconfig at %q: %w; GUI builds of the macOS client run in a sandbox and can only access files under your home directory, use the open-source mae-routingd distribution for other locations", path, err)
 	}
 	return fmt.Errorf("cannot write kubeconfig at %q: %w", path, err)
 }
@@ -155,7 +155,7 @@ func runConfigureKubeconfig(ctx context.Context, args []string) error {
 		return err
 	}
 	if st.BackendState != "Running" {
-		return errors.New("Tailscale is not running")
+		return errors.New("MAE Routing is not running")
 	}
 	dnsCfg, err := getDNSConfig(ctx)
 	if err != nil {

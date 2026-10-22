@@ -247,13 +247,13 @@ func (s *settings) validate() error {
 	if s.TailscaledConfigFilePath != "" {
 		dir, file := path.Split(s.TailscaledConfigFilePath)
 		if _, err := os.Stat(dir); err != nil {
-			return fmt.Errorf("error validating whether directory with tailscaled config file %s exists: %w", dir, err)
+			return fmt.Errorf("error validating whether directory with mae-routingd config file %s exists: %w", dir, err)
 		}
 		if _, err := os.Stat(s.TailscaledConfigFilePath); err != nil {
-			return fmt.Errorf("error validating whether tailscaled config directory %q contains tailscaled config for current capability version %q: %w. If this is a Tailscale Kubernetes operator proxy, please ensure that the version of the operator is not older than the version of the proxy", dir, file, err)
+			return fmt.Errorf("error validating whether mae-routingd config directory %q contains mae-routingd config for current capability version %q: %w. If this is a MAE Routing Kubernetes operator proxy, please ensure that the version of the operator is not older than the version of the proxy", dir, file, err)
 		}
 		if _, err := conffile.Load(s.TailscaledConfigFilePath); err != nil {
-			return fmt.Errorf("error validating tailscaled configfile contents: %w", err)
+			return fmt.Errorf("error validating mae-routingd configfile contents: %w", err)
 		}
 	}
 	if s.ProxyTargetIP != "" && s.UserspaceMode {
@@ -347,10 +347,10 @@ func (s *settings) validate() error {
 		return errors.New("TS_HEALTHCHECK_ADDR_PORT is deprecated and will be removed in 1.82.0, use TS_ENABLE_HEALTH_CHECK and optionally TS_LOCAL_ADDR_PORT")
 	}
 	if s.EgressProxiesCfgPath != "" && !(s.InKubernetes && s.KubeSecret != "") {
-		return errors.New("TS_EGRESS_PROXIES_CONFIG_PATH is only supported for Tailscale running on Kubernetes")
+		return errors.New("TS_EGRESS_PROXIES_CONFIG_PATH is only supported for MAE Routing running on Kubernetes")
 	}
 	if s.IngressProxiesCfgPath != "" && !(s.InKubernetes && s.KubeSecret != "") {
-		return errors.New("TS_INGRESS_PROXIES_CONFIG_PATH is only supported for Tailscale running on Kubernetes")
+		return errors.New("TS_INGRESS_PROXIES_CONFIG_PATH is only supported for MAE Routing running on Kubernetes")
 	}
 
 	// Error out when passed a malformed duration in `TS_BOOT_TIMEOUT` env var.
@@ -379,12 +379,12 @@ func (cfg *settings) setupKube(ctx context.Context, kc *kubeClient) error {
 	s, err := kc.GetSecret(ctx, cfg.KubeSecret)
 	if err != nil {
 		if !kubeclient.IsNotFoundErr(err) {
-			return fmt.Errorf("getting Tailscale state Secret %s: %v", cfg.KubeSecret, err)
+			return fmt.Errorf("getting MAE Routing state Secret %s: %v", cfg.KubeSecret, err)
 		}
 
 		if !canCreate {
-			return fmt.Errorf("tailscale state Secret %s does not exist and we don't have permissions to create it. "+
-				"If you intend to store tailscale state elsewhere than a Kubernetes Secret, "+
+			return fmt.Errorf("mae-routing state Secret %s does not exist and we don't have permissions to create it. "+
+				"If you intend to store mae-routing state elsewhere than a Kubernetes Secret, "+
 				"you can explicitly set TS_KUBE_SECRET env var to an empty string. "+
 				"Else ensure that RBAC is set up that allows the service account associated with this installation to create Secrets.", cfg.KubeSecret)
 		}

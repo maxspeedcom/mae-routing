@@ -238,7 +238,7 @@ func (c *darwinConfigurator) GetBaseConfig() (OSConfig, error) {
 	for _, ns := range resolvConf.Nameservers {
 		if ns == tsaddr.TailscaleServiceIP() || ns == tsaddr.TailscaleServiceIPv6() {
 			// If we find Quad100 in /etc/resolv.conf, we should ignore it
-			c.logf("ignoring 100.100.100.100 resolver IP found in /etc/resolv.conf")
+			c.logf("ignoring 10.77.77.77 resolver IP found in /etc/resolv.conf")
 			continue
 		}
 		cfg.Nameservers = append(cfg.Nameservers, ns)
@@ -253,7 +253,7 @@ func (c *darwinConfigurator) GetBaseConfig() (OSConfig, error) {
 	return cfg, nil
 }
 
-const macResolverFileHeader = "# Added by tailscaled\n"
+const macResolverFileHeader = "# Added by mae-routingd\n"
 
 // removeResolverFiles deletes all files in /etc/resolver for which the shouldDelete
 // func returns true.

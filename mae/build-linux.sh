@@ -25,7 +25,7 @@ for ARCH in amd64 arm64 arm 386; do
   GOARCH=$ARCH GOARM=7 go build -trimpath -tags "$TAGS" -ldflags "$LDFLAGS" -o "$D/mae-routing" ./cmd/tailscale
   GOARCH=$ARCH GOARM=7 go build -trimpath -tags "$TAGS" -ldflags "$LDFLAGS" -o "$D/mae-routingd" ./cmd/tailscaled
   cp "$HERE/linux/mae-routingd.service" "$HERE/linux/mae-routingd.defaults" "$HERE/linux/mae-routingd.openrc" "$D/"
-  cp "$SRC/LICENSE" "$D/LICENSE-tailscale.txt"
+  cp "$SRC/LICENSE" "$D/THIRD-PARTY-NOTICES.txt"
   tar -C "$OUT" -czf "$OUT/mae-routing_${VERSION}_${ARCH}.tgz" "mae-routing_${VERSION}_${ARCH}"
   # packages use Debian/RPM arch names
   case $ARCH in arm) PARCH=armhf; RARCH=armv7hl ;; 386) PARCH=i386; RARCH=i386 ;; arm64) PARCH=arm64; RARCH=aarch64 ;; *) PARCH=amd64; RARCH=x86_64 ;; esac

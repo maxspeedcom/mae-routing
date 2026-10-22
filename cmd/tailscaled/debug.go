@@ -283,5 +283,5 @@ func checkDerp(ctx context.Context, derpRegion string) (err error) {
 }
 
 func debugPortmap(ctx context.Context) error {
-	return fmt.Errorf("this flag has been deprecated in favour of 'tailscale debug portmap'")
+	return fmt.Errorf("this flag has been deprecated in favour of 'mae-routing debug portmap'")
 }

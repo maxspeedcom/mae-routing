@@ -31,11 +31,11 @@ import (
 
 var setCmd = &ffcli.Command{
 	Name:       "set",
-	ShortUsage: "tailscale set [flags]",
+	ShortUsage: "mae-routing set [flags]",
 	ShortHelp:  "Change specified preferences",
-	LongHelp: `"tailscale set" allows changing specific preferences.
+	LongHelp: `"mae-routing set" allows changing specific preferences.
 
-Unlike "tailscale up", this command does not require the complete set of desired settings.
+Unlike "mae-routing up", this command does not require the complete set of desired settings.
 
 Only settings explicitly mentioned will be set. There are no default values.`,
 	FlagSet:   setFlagSet,
@@ -75,9 +75,9 @@ func newSetFlagSet(goos string, setArgs *setArgsT) *flag.FlagSet {
 	setf := newFlagSet("set")
 
 	setf.StringVar(&setArgs.profileName, "nickname", "", "nickname for the current account")
-	setf.BoolVar(&setArgs.acceptRoutes, "accept-routes", acceptRouteDefault(goos), "accept routes advertised by other Tailscale nodes")
+	setf.BoolVar(&setArgs.acceptRoutes, "accept-routes", acceptRouteDefault(goos), "accept routes advertised by other MAE Routing nodes")
 	setf.BoolVar(&setArgs.acceptDNS, "accept-dns", true, "accept DNS configuration from the admin panel")
-	setf.StringVar(&setArgs.exitNodeIP, "exit-node", "", "Tailscale exit node (IP, base name, or auto:any) for internet traffic, or empty string to not use an exit node")
+	setf.StringVar(&setArgs.exitNodeIP, "exit-node", "", "MAE Routing exit node (IP, base name, or auto:any) for internet traffic, or empty string to not use an exit node")
 	setf.BoolVar(&setArgs.exitNodeAllowLANAccess, "exit-node-allow-lan-access", false, "allow direct access to the local network when routing traffic via an exit node")
 	setf.BoolVar(&setArgs.shieldsUp, "shields-up", false, "don't allow incoming connections")
 	setf.BoolVar(&setArgs.runSSH, "ssh", false, "run an SSH server, permitting access per tailnet admin's declared policy")
@@ -85,11 +85,11 @@ func newSetFlagSet(goos string, setArgs *setArgsT) *flag.FlagSet {
 	setf.StringVar(&setArgs.advertiseRoutes, "advertise-routes", "", "routes to advertise to other nodes (comma-separated, e.g. \"10.0.0.0/8,192.168.0.0/24\") or empty string to not advertise routes")
 	setf.BoolVar(&setArgs.advertiseDefaultRoute, "advertise-exit-node", false, "offer to be an exit node for internet traffic for the tailnet")
 	setf.BoolVar(&setArgs.advertiseConnector, "advertise-connector", false, "offer to be an app connector for domain specific internet traffic for the tailnet")
-	setf.BoolVar(&setArgs.updateCheck, "update-check", true, "notify about available Tailscale updates")
+	setf.BoolVar(&setArgs.updateCheck, "update-check", true, "notify about available MAE Routing updates")
 	setf.BoolVar(&setArgs.updateApply, "auto-update", false, "automatically update to the latest available version")
 	setf.BoolVar(&setArgs.reportPosture, "report-posture", false, "allow management plane to gather device posture information")
-	setf.BoolVar(&setArgs.runWebClient, "webclient", false, "expose the web interface for managing this node over Tailscale at port 5252")
-	setf.BoolVar(&setArgs.remoteConfig, "remote-config", false, hidden+"delegate FULL remote control of this node's prefs and LocalAPI to the tailnet admin, bypassing Tailscale's per-feature double opt-in; only use when the tailnet admin owns or is fully trusted with this machine")
+	setf.BoolVar(&setArgs.runWebClient, "webclient", false, "expose the web interface for managing this node over MAE Routing at port 5252")
+	setf.BoolVar(&setArgs.remoteConfig, "remote-config", false, hidden+"delegate FULL remote control of this node's prefs and LocalAPI to the tailnet admin, bypassing MAE Routing's per-feature double opt-in; only use when the tailnet admin owns or is fully trusted with this machine")
 	setf.BoolVar(&setArgs.sync, "sync", false, hidden+"actively sync configuration from the control plane (set to false only for network failure testing)")
 	setf.StringVar(&setArgs.relayServerPort, "relay-server-port", "", "UDP port number (0 will pick a random unused port) for the relay server to bind to, on all interfaces, or empty string to disable relay server functionality")
 	setf.StringVar(&setArgs.relayServerStaticEndpoints, "relay-server-static-endpoints", "", "static IP:port endpoints to advertise as candidates for relay connections (comma-separated, e.g. \"[2001:db8::1]:40000,192.0.2.1:40000\") or empty string to not advertise any static endpoints")
@@ -110,7 +110,7 @@ func newSetFlagSet(goos string, setArgs *setArgsT) *flag.FlagSet {
 	})
 
 	if safesocket.GOOSUsesPeerCreds(goos) {
-		setf.StringVar(&setArgs.opUser, "operator", "", "Unix username to allow to operate on tailscaled without sudo")
+		setf.StringVar(&setArgs.opUser, "operator", "", "Unix username to allow to operate on mae-routingd without sudo")
 	}
 	switch goos {
 	case "linux":
@@ -120,7 +120,7 @@ func newSetFlagSet(goos string, setArgs *setArgsT) *flag.FlagSet {
 	case "freebsd":
 		setf.BoolVar(&setArgs.snat, "snat-subnet-routes", true, "source NAT traffic to local routes advertised with --advertise-routes")
 	case "windows":
-		setf.BoolVar(&setArgs.forceDaemon, "unattended", false, "run in \"Unattended Mode\" where Tailscale keeps running even after the current GUI user logs out (Windows-only)")
+		setf.BoolVar(&setArgs.forceDaemon, "unattended", false, "run in \"Unattended Mode\" where MAE Routing keeps running even after the current GUI user logs out (Windows-only)")
 	}
 
 	registerAcceptRiskFlag(setf, &setArgs.acceptedRisks)

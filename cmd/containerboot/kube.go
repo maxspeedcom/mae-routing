@@ -238,7 +238,7 @@ func (kc *kubeClient) waitForConsistentState(ctx context.Context) error {
 		}
 
 		if !logged {
-			log.Printf("Waiting for tailscaled to finish writing state to Secret %q", kc.stateSecret)
+			log.Printf("Waiting for mae-routingd to finish writing state to Secret %q", kc.stateSecret)
 			logged = true
 		}
 		bo.BackOff(ctx, errors.New("")) // Fake error to trigger actual sleep.

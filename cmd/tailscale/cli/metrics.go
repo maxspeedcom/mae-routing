@@ -15,39 +15,39 @@ import (
 
 var metricsCmd = &ffcli.Command{
 	Name:      "metrics",
-	ShortHelp: "Show Tailscale metrics",
+	ShortHelp: "Show MAE Routing metrics",
 	LongHelp: strings.TrimSpace(`
 
-The 'tailscale metrics' command shows Tailscale user-facing metrics (as opposed
-to internal metrics printed by 'tailscale debug metrics').
+The 'mae-routing metrics' command shows MAE Routing user-facing metrics (as opposed
+to internal metrics printed by 'mae-routing debug metrics').
 
-For more information about Tailscale metrics, refer to
-https://tailscale.com/s/client-metrics
+For more information about MAE Routing metrics, refer to
+https://routing.maesuaisystem.com/
 
 `),
-	ShortUsage: "tailscale metrics <subcommand> [flags]",
+	ShortUsage: "mae-routing metrics <subcommand> [flags]",
 	UsageFunc:  usageFuncNoDefaultValues,
 	Exec:       runMetricsNoSubcommand,
 	Subcommands: []*ffcli.Command{
 		{
 			Name:       "print",
-			ShortUsage: "tailscale metrics print",
+			ShortUsage: "mae-routing metrics print",
 			Exec:       runMetricsPrint,
 			ShortHelp:  "Print current metric values in Prometheus text format",
 		},
 		{
 			Name:       "write",
-			ShortUsage: "tailscale metrics write <path>",
+			ShortUsage: "mae-routing metrics write <path>",
 			Exec:       runMetricsWrite,
 			ShortHelp:  "Write metric values to a file",
 			LongHelp: strings.TrimSpace(`
 
-The 'tailscale metrics write' command writes metric values to a text file provided as its
-only argument. It's meant to be used alongside Prometheus node exporter, allowing Tailscale
+The 'mae-routing metrics write' command writes metric values to a text file provided as its
+only argument. It's meant to be used alongside Prometheus node exporter, allowing MAE Routing
 metrics to be consumed and exported by the textfile collector.
 
-As an example, to export Tailscale metrics on an Ubuntu system running node exporter, you
-can regularly run 'tailscale metrics write /var/lib/prometheus/node-exporter/tailscaled.prom'
+As an example, to export MAE Routing metrics on an Ubuntu system running node exporter, you
+can regularly run 'mae-routing metrics write /var/lib/prometheus/node-exporter/tailscaled.prom'
 using cron or a systemd timer.
 
 	`),
@@ -58,7 +58,7 @@ using cron or a systemd timer.
 // runMetricsNoSubcommand prints metric values if no subcommand is specified.
 func runMetricsNoSubcommand(ctx context.Context, args []string) error {
 	if len(args) > 0 {
-		return fmt.Errorf("tailscale metrics: unknown subcommand: %s", args[0])
+		return fmt.Errorf("mae-routing metrics: unknown subcommand: %s", args[0])
 	}
 
 	return runMetricsPrint(ctx, args)
@@ -77,7 +77,7 @@ func runMetricsPrint(ctx context.Context, args []string) error {
 // runMetricsWrite writes metric values to a file.
 func runMetricsWrite(ctx context.Context, args []string) error {
 	if len(args) != 1 {
-		return errors.New("usage: tailscale metrics write <path>")
+		return errors.New("usage: mae-routing metrics write <path>")
 	}
 	path := args[0]
 	out, err := localClient.UserMetrics(ctx)

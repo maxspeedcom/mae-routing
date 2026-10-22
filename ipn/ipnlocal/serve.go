@@ -82,7 +82,7 @@ var ErrETagMismatch = errors.New("etag mismatch")
 
 // ErrProxyToTailscaledSocket is returned when attempting to proxy
 // to the tailscaled socket itself, which would create a loop.
-var ErrProxyToTailscaledSocket = errors.New("cannot proxy to tailscaled socket")
+var ErrProxyToTailscaledSocket = errors.New("cannot proxy to mae-routingd socket")
 
 var serveHTTPContextKey ctxkey.Key[*serveHTTPContext]
 
@@ -188,7 +188,7 @@ func (s *localListener) Run() {
 		if initListenConfig != nil && !s.allowAllInterfaces {
 			ifIndex, err := netmon.TailscaleInterfaceIndex()
 			if err != nil {
-				s.logf("localListener failed to get Tailscale interface index %v, backing off: %v", s.ap, err)
+				s.logf("localListener failed to get MAE Routing interface index %v, backing off: %v", s.ap, err)
 				s.bo.BackOff(s.ctx, err)
 				continue
 			}
@@ -348,7 +348,7 @@ func (b *LocalBackend) setServeConfigLocked(config *ipn.ServeConfig, etag string
 		return errors.New("Unable to turn on Funnel while shields-up is enabled")
 	}
 	if b.isConfigLocked_Locked() {
-		return errors.New("can't reconfigure tailscaled when using a config file; config file is locked")
+		return errors.New("can't reconfigure mae-routingd when using a config file; config file is locked")
 	}
 
 	nm := b.NetMapNoPeers()

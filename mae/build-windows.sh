@@ -32,7 +32,7 @@ if [ ! -f "$HERE/out/wintun-$WVER.zip" ]; then
 fi
 echo "$WSHA  $HERE/out/wintun-$WVER.zip" | sha256sum -c --quiet
 unzip -o -q -j "$HERE/out/wintun-$WVER.zip" "wintun/bin/amd64/wintun.dll" -d "$OUT"
-cp "$SRC/LICENSE" "$OUT/LICENSE-tailscale.txt"
+cp "$SRC/LICENSE" "$OUT/THIRD-PARTY-NOTICES.txt"
 unzip -o -q -j "$HERE/out/wintun-$WVER.zip" "wintun/LICENSE.txt" -d "$HERE/out" && mv "$HERE/out/LICENSE.txt" "$OUT/LICENSE-wintun.txt"
 ls -la "$OUT"
 

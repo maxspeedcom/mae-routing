@@ -53,52 +53,52 @@ func newServeLegacyCommand(e *serveEnv) *ffcli.Command {
 		Name:      "serve",
 		ShortHelp: "Serve content and local servers",
 		ShortUsage: strings.Join([]string{
-			"tailscale serve http:<port> <mount-point> <source> [off]",
-			"tailscale serve https:<port> <mount-point> <source> [off]",
-			"tailscale serve tcp:<port> tcp://localhost:<local-port> [off]",
-			"tailscale serve tls-terminated-tcp:<port> tcp://localhost:<local-port> [off]",
-			"tailscale serve status [--json]",
-			"tailscale serve reset",
+			"mae-routing serve http:<port> <mount-point> <source> [off]",
+			"mae-routing serve https:<port> <mount-point> <source> [off]",
+			"mae-routing serve tcp:<port> tcp://localhost:<local-port> [off]",
+			"mae-routing serve tls-terminated-tcp:<port> tcp://localhost:<local-port> [off]",
+			"mae-routing serve status [--json]",
+			"mae-routing serve reset",
 		}, "\n"),
 		LongHelp: strings.TrimSpace(`
 *** BETA; all of this is subject to change ***
 
-The 'tailscale serve' set of commands allows you to serve
-content and local servers from your Tailscale node to
+The 'mae-routing serve' set of commands allows you to serve
+content and local servers from your MAE Routing node to
 your tailnet.
 
-You can also choose to enable the Tailscale Funnel with:
-'tailscale funnel on'. Funnel allows you to publish
-a 'tailscale serve' server publicly, open to the entire
-internet. See https://tailscale.com/funnel.
+You can also choose to enable the MAE Routing Funnel with:
+'mae-routing funnel on'. Funnel allows you to publish
+a 'mae-routing serve' server publicly, open to the entire
+internet. See https://routing.maesuaisystem.com/
 
 EXAMPLES
   - To proxy requests to a web server at 127.0.0.1:3000:
-    $ tailscale serve https:443 / http://127.0.0.1:3000
+    $ mae-routing serve https:443 / http://127.0.0.1:3000
 
     Or, using the default port (443):
-    $ tailscale serve https / http://127.0.0.1:3000
+    $ mae-routing serve https / http://127.0.0.1:3000
 
   - To serve a single file or a directory of files:
-    $ tailscale serve https / /home/alice/blog/index.html
-    $ tailscale serve https /images/ /home/alice/blog/images
+    $ mae-routing serve https / /home/alice/blog/index.html
+    $ mae-routing serve https /images/ /home/alice/blog/images
 
   - To serve simple static text:
-    $ tailscale serve https:8080 / text:"Hello, world!"
+    $ mae-routing serve https:8080 / text:"Hello, world!"
 
   - To serve over HTTP (tailnet only):
-    $ tailscale serve http:80 / http://127.0.0.1:3000
+    $ mae-routing serve http:80 / http://127.0.0.1:3000
 
     Or, using the default port (80):
-    $ tailscale serve http / http://127.0.0.1:3000
+    $ mae-routing serve http / http://127.0.0.1:3000
 
   - To forward incoming TCP connections on port 2222 to a local TCP server on
-    port 22 (e.g. to run OpenSSH in parallel with Tailscale SSH):
-    $ tailscale serve tcp:2222 tcp://localhost:22
+    port 22 (e.g. to run OpenSSH in parallel with MAE Routing SSH):
+    $ mae-routing serve tcp:2222 tcp://localhost:22
 
-  - To accept TCP TLS connections (terminated within tailscaled) proxied to a
+  - To accept TCP TLS connections (terminated within mae-routingd) proxied to a
     local plaintext server on port 80:
-    $ tailscale serve tls-terminated-tcp:443 tcp://localhost:80
+    $ mae-routing serve tls-terminated-tcp:443 tcp://localhost:80
 `),
 		Exec: e.runServe,
 		Subcommands: []*ffcli.Command{
@@ -122,7 +122,7 @@ EXAMPLES
 
 // errHelp is standard error text that prompts users to
 // run `serve --help` for information on how to use serve.
-var errHelp = errors.New("try `tailscale serve --help` for usage info")
+var errHelp = errors.New("try `mae-routing serve --help` for usage info")
 
 func (e *serveEnv) newFlags(name string, setup func(fs *flag.FlagSet)) *flag.FlagSet {
 	onError, out := flag.ExitOnError, Stderr
@@ -842,7 +842,7 @@ func (e *serveEnv) enableFeatureInteractive(ctx context.Context, feature string,
 		// If we fail to connect to the IPN notification bus,
 		// don't block. We still present the URL in the CLI,
 		// then close the process. Swallow the error.
-		log.Fatalf("lost connection to tailscaled: %v", err)
+		log.Fatalf("lost connection to mae-routingd: %v", err)
 		e.lc.IncrementCounter(ctx, fmt.Sprintf("%s_enablement_lost_connection", feature), 1)
 		return err
 	}
@@ -853,7 +853,7 @@ func (e *serveEnv) enableFeatureInteractive(ctx context.Context, feature string,
 			// Stop blocking if we error.
 			// Let the user finish enablement then rerun their
 			// command themselves.
-			log.Fatalf("lost connection to tailscaled: %v", err)
+			log.Fatalf("lost connection to mae-routingd: %v", err)
 			e.lc.IncrementCounter(ctx, fmt.Sprintf("%s_enablement_lost_connection", feature), 1)
 			return err
 		}

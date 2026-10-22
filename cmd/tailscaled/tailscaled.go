@@ -116,7 +116,7 @@ func defaultPort() uint16 {
 		}
 	}
 	if envknob.GOOS() == "windows" {
-		return 41641
+		return 41642
 	}
 	return 0
 }
@@ -222,7 +222,7 @@ func main() {
 	flag.StringVar(&args.statedir, "statedir", "", "path to directory for storage of config state, TLS certs, temporary incoming Taildrop files, etc. If empty, it's derived from --state when possible.")
 	flag.StringVar(&args.socketpath, "socket", paths.DefaultTailscaledSocket(), "path of the service unix socket")
 	if runtime.GOOS == "windows" {
-		flag.Func("windows-mode", `how tailscaled is being run: "" (the default) is the Tailscale service or an administrator standing in for it, which must use the default --socket; "dev" is a developer running tailscaled by hand, which listens on \\.\pipe\tailscale-<user SID> by default and only accepts connections from that user`, func(s string) error {
+		flag.Func("windows-mode", `how mae-routingd is being run: "" (the default) is the MAE Routing service or an administrator standing in for it, which must use the default --socket; "dev" is a developer running mae-routingd by hand, which listens on \\.\pipe\tailscale-<user SID> by default and only accepts connections from that user`, func(s string) error {
 			args.windowsMode = tsconst.WindowsMode(s)
 			return nil
 		})
@@ -236,7 +236,7 @@ func main() {
 	if buildfeatures.HasTPM {
 		flag.Var(&args.hardwareAttestation, "hardware-attestation", `use hardware-backed keys to bind node identity to this device when supported
 by the OS and hardware. Uses TPM 2.0 on Linux and Windows; SecureEnclave on
-macOS and iOS; and Keystore on Android. Only supported for Tailscale nodes that
+macOS and iOS; and Keystore on Android. Only supported for MAE Routing nodes that
 store state on filesystem.`)
 	}
 	if f, ok := hookRegisterOutboundProxyFlags.GetOk(); ok {
@@ -269,7 +269,7 @@ store state on filesystem.`)
 	if flag.NArg() > 0 {
 		// Windows subprocess is spawned with /subprocess, so we need to avoid this check there.
 		if runtime.GOOS != "windows" || (flag.Arg(0) != "/subproc" && flag.Arg(0) != "/firewall") {
-			log.Fatalf("tailscaled does not take non-flag arguments: %q", flag.Args())
+			log.Fatalf("mae-routingd does not take non-flag arguments: %q", flag.Args())
 		}
 	}
 
@@ -288,7 +288,7 @@ store state on filesystem.`)
 
 	if runtime.GOOS == "darwin" && os.Getuid() != 0 && !strings.Contains(args.tunname, "userspace-networking") && !args.cleanUp {
 		log.SetFlags(0)
-		log.Fatalf("tailscaled requires root; use sudo tailscaled (or use --tun=userspace-networking)")
+		log.Fatalf("mae-routingd requires root; use sudo mae-routingd (or use --tun=userspace-networking)")
 	}
 
 	if args.socketpath == "" && runtime.GOOS != "windows" {
@@ -364,7 +364,7 @@ func applyWindowsMode() error {
 	switch args.windowsMode {
 	case tsconst.WindowsModeDefault:
 		if !paths.IsWindowsProtectedPipe(args.socketpath) {
-			return fmt.Errorf("--socket=%q is not under %s, the prefix only administrators can create pipes in; the Tailscale service must use the default socket, and a developer running tailscaled by hand must pass --windows-mode=dev", args.socketpath, paths.WindowsProtectedPipePrefix)
+			return fmt.Errorf("--socket=%q is not under %s, the prefix only administrators can create pipes in; the MAE Routing service must use the default socket, and a developer running mae-routingd by hand must pass --windows-mode=dev", args.socketpath, paths.WindowsProtectedPipePrefix)
 		}
 	case tsconst.WindowsModeDev:
 		socketSet := false
@@ -380,7 +380,7 @@ func applyWindowsMode() error {
 			}
 		}
 	default:
-		return fmt.Errorf("invalid --windows-mode=%q; valid values are %q (the default, for the Tailscale service) and %q", args.windowsMode, tsconst.WindowsModeDefault, tsconst.WindowsModeDev)
+		return fmt.Errorf("invalid --windows-mode=%q; valid values are %q (the default, for the MAE Routing service) and %q", args.windowsMode, tsconst.WindowsModeDefault, tsconst.WindowsModeDev)
 	}
 	return nil
 }
@@ -630,7 +630,7 @@ func startIPNServer(ctx context.Context, logf logger.Logf, logID logid.PublicID,
 		for {
 			select {
 			case s := <-interrupt:
-				logf("tailscaled got signal %v; shutting down", s)
+				logf("mae-routingd got signal %v; shutting down", s)
 				cancel()
 				return
 			case <-wgEngineClosed:
@@ -1061,7 +1061,7 @@ func handleTPMFlags() {
 // enabled, either due to availability or compatibility with other settings.
 func canUseHardwareAttestation() error {
 	if _, err := key.NewEmptyHardwareAttestationKey(); err == key.ErrUnsupported {
-		return errors.New("--hardware-attestation is not supported on this platform or in this build of tailscaled")
+		return errors.New("--hardware-attestation is not supported on this platform or in this build of mae-routingd")
 	}
 	// Hardware attestation keys are TPM-bound and cannot be migrated between
 	// machines. Disable when using portable state stores like kube: or arn:

@@ -241,7 +241,7 @@ var networkCategoryWarnable = health.Register(&health.Warnable{
 	Severity: health.SeverityMedium,
 	Title:    "Windows network configuration failed",
 	Text: func(args health.Args) string {
-		return fmt.Sprintf("Failed to set the network category to private on the Tailscale adapter. This may prevent Tailscale from working correctly. Error: %s", args[health.ArgError])
+		return fmt.Sprintf("Failed to set the network category to private on the MAE Routing adapter. This may prevent MAE Routing from working correctly. Error: %s", args[health.ArgError])
 	},
 	MapDebugFlag: "warn-network-category-unhealthy",
 })
@@ -308,7 +308,7 @@ func configureInterface(cfg *router.Config, tun *tun.NativeTun, ht *health.Track
 		if !errors.Is(err, windows.ERROR_NOT_FOUND) {
 			return fmt.Errorf("getting AF_INET interface: %w", err)
 		}
-		log.Printf("AF_INET interface not found on Tailscale adapter, skipping IPv4 programming")
+		log.Printf("AF_INET interface not found on MAE Routing adapter, skipping IPv4 programming")
 		ipif4 = nil
 	}
 	ipif6, err := iface.LUID.IPInterface(windows.AF_INET6)
@@ -316,7 +316,7 @@ func configureInterface(cfg *router.Config, tun *tun.NativeTun, ht *health.Track
 		if !errors.Is(err, windows.ERROR_NOT_FOUND) {
 			return fmt.Errorf("getting AF_INET6 interface: %w", err)
 		}
-		log.Printf("AF_INET6 interface not found on Tailscale adapter, skipping IPv6 programming")
+		log.Printf("AF_INET6 interface not found on MAE Routing adapter, skipping IPv6 programming")
 		ipif6 = nil
 	}
 

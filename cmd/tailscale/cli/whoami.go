@@ -15,11 +15,11 @@ import (
 
 var whoamiCmd = &ffcli.Command{
 	Name:       "whoami",
-	ShortUsage: "tailscale whoami [--json]",
+	ShortUsage: "mae-routing whoami [--json]",
 	ShortHelp:  "Show the machine and user identity of the current machine",
 	LongHelp: strings.TrimSpace(`
-	'tailscale whoami' shows the machine and user identity of the current machine.
-	It is equivalent to running 'tailscale whois' against one of the current machine's own Tailscale IP addresses.
+	'mae-routing whoami' shows the machine and user identity of the current machine.
+	It is equivalent to running 'mae-routing whois' against one of the current machine's own MAE Routing IP addresses.
 	`),
 	Exec: runWhoami,
 	FlagSet: func() *flag.FlagSet {
@@ -42,7 +42,7 @@ func runWhoami(ctx context.Context, args []string) error {
 		return err
 	}
 	if len(st.TailscaleIPs) == 0 {
-		return fmt.Errorf("no current Tailscale IP address; state: %v", st.BackendState)
+		return fmt.Errorf("no current MAE Routing IP address; state: %v", st.BackendState)
 	}
 	who, err := localClient.WhoIsProto(ctx, "", st.TailscaleIPs[0].String())
 	if err != nil {

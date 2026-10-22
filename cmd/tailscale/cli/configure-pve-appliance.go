@@ -43,11 +43,11 @@ var pveApplianceArgs struct {
 func pveApplianceCmd() *ffcli.Command {
 	return &ffcli.Command{
 		Name:       "pve-appliance",
-		ShortUsage: "tailscale configure pve-appliance --storage=<name> [flags]",
-		ShortHelp:  "Create a Proxmox VE VM running the Tailscale appliance image [experimental]",
+		ShortUsage: "mae-routing configure pve-appliance --storage=<name> [flags]",
+		ShortHelp:  "Create a Proxmox VE VM running the MAE Routing appliance image [experimental]",
 		LongHelp: hidden + strings.TrimSpace(`
-This experimental command downloads a signed Tailscale appliance GAF from
-pkgs.tailscale.com, builds a raw disk image in /var/tmp, then invokes
+This experimental command downloads a signed MAE Routing appliance GAF from
+the upstream package server, builds a raw disk image in /var/tmp, then invokes
 'qm create' / 'qm disk import' / 'qm set' on the local Proxmox VE host to
 create a new VM backed by that image. It must be run on the PVE host
 itself (where the 'qm' CLI is available).
@@ -64,9 +64,9 @@ needing an SSH key.
 
 Defaults are chosen so a bare invocation like:
 
-    tailscale configure pve-appliance --storage=local-lvm
+    mae-routing configure pve-appliance --storage=local-lvm
 
-is enough to produce a bootable Tailscale appliance VM.
+is enough to produce a bootable MAE Routing appliance VM.
 `),
 		FlagSet: (func() *flag.FlagSet {
 			fs := newFlagSet("pve-appliance")
@@ -271,13 +271,13 @@ func createPVEVM(ctx context.Context, vmid int, name string) error {
 // appliance without needing an SSH key: the framebuffer console (press
 // Esc for a shell) and the serial console (qm terminal).
 func vmNotes(vmid int) string {
-	return fmt.Sprintf(`# Tailscale appliance [experimental]
+	return fmt.Sprintf(`# MAE Routing appliance [experimental]
 
 Admin access to this VM (no SSH key required):
 
 - **Framebuffer / NoVNC console**: press **Esc** on the enrollment screen
   to drop into a busybox shell. Type `+"`exit`"+` to return to the
-  Tailscale status display.
+  MAE Routing status display.
 
 - **Serial console**: on this Proxmox host, run
 
@@ -287,7 +287,7 @@ Admin access to this VM (no SSH key required):
   detach from `+"`qm terminal`"+` (leaves the guest shell alive).
 
 Inside either shell, run `+"`tailscale`"+` commands as usual
-(`+"`tailscale up`"+`, `+"`tailscale status`"+`, etc.).
+(`+"`mae-routing up`"+`, `+"`mae-routing status`"+`, etc.).
 `, vmid)
 }
 

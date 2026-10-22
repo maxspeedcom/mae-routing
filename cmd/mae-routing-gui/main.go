@@ -1,13 +1,13 @@
-// Copyright (c) MAE Routing (maesuaisystem.com). Based on Tailscale (BSD-3-Clause).
+// Copyright (c) MAE Routing (maesuaisystem.com).
 
 //go:build windows
 
 // Command mae-routing-gui is the MAE Routing tray app for Windows (MAERouting.exe).
 //
-// It talks to the MAERouting service (maeroutingd.exe, a branded tailscaled) over the LocalAPI named pipe,
+// It talks to the MAERouting service (maeroutingd.exe) over the LocalAPI named pipe,
 // shows the connection state in the notification area, and signs in to an organisation's network by its
 // name: <org> becomes the control server https://<org>.routing.maesuaisystem.com.
-// The structure follows tailscale.com/client/systray (Linux), with Thai labels.
+// Thai labels throughout.
 package main
 
 import (
@@ -485,7 +485,7 @@ func copyIP(name, ip string) {
 }
 
 func about() {
-	zenity.Info(fmt.Sprintf("%s %s\n\nเครือข่ายส่วนตัวสำหรับองค์กร\nhttps://%s\n\nส่วนหนึ่งพัฒนาต่อจาก Tailscale\n© Tailscale Inc & contributors · BSD-3-Clause",
+	zenity.Info(fmt.Sprintf("%s %s\n\nเครือข่ายส่วนตัวสำหรับองค์กร\nhttps://%s\n\nสัญญาอนุญาตของส่วนประกอบโอเพนซอร์ส: THIRD-PARTY-NOTICES.txt ในโฟลเดอร์โปรแกรม",
 		appName, version.Short(), zone), zenity.Title("เกี่ยวกับ "+appName))
 }
 

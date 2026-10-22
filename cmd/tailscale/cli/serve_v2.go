@@ -144,18 +144,18 @@ On Unix-like systems, you can also specify a Unix domain socket (e.g., unix:/tmp
 
 EXAMPLES
   - Expose an HTTP server running at 127.0.0.1:3000 in the foreground:
-    $ tailscale %[1]s 3000
+    $ mae-routing %[1]s 3000
 
   - Expose an HTTP server running at 127.0.0.1:3000 in the background:
-    $ tailscale %[1]s --bg 3000
+    $ mae-routing %[1]s --bg 3000
 
   - Expose an HTTPS server with invalid or self-signed certificates at https://localhost:8443
-    $ tailscale %[1]s https+insecure://localhost:8443
+    $ mae-routing %[1]s https+insecure://localhost:8443
 
   - Expose a service listening on a Unix socket (Linux/macOS/BSD only):
-    $ tailscale %[1]s unix:/var/run/myservice.sock
+    $ mae-routing %[1]s unix:/var/run/myservice.sock
 
-For more examples and use cases visit our docs site https://tailscale.com/kb/1247/funnel-serve-use-cases
+For more examples and use cases visit our docs site https://routing.maesuaisystem.com/
 `)
 
 type serveMode int
@@ -198,16 +198,16 @@ var infoMap = map[serveMode]commandInfo{
 		Name:      "serve",
 		ShortHelp: "Serve content and local servers on your tailnet",
 		LongHelp: strings.Join([]string{
-			"Tailscale Serve enables you to share a local server securely within your tailnet.\n",
-			"To share a local server on the internet, use `tailscale funnel`\n\n",
+			"MAE Routing Serve enables you to share a local server securely within your tailnet.\n",
+			"To share a local server on the internet, use `mae-routing funnel`\n\n",
 		}, "\n"),
 	},
 	funnel: {
 		Name:      "funnel",
 		ShortHelp: "Serve content and local servers on the internet",
 		LongHelp: strings.Join([]string{
-			"Funnel enables you to share a local server on the internet using Tailscale.\n",
-			"To share only within your tailnet, use `tailscale serve`\n\n",
+			"Funnel enables you to share a local server on the internet using MAE Routing.\n",
+			"To share only within your tailnet, use `mae-routing serve`\n\n",
 		}, "\n"),
 	},
 }
@@ -215,7 +215,7 @@ var infoMap = map[serveMode]commandInfo{
 // errHelpFunc is standard error text that prompts users to
 // run `$subcmd --help` for information on how to use serve.
 var errHelpFunc = func(m serveMode) error {
-	return fmt.Errorf("try `tailscale %s --help` for usage info", infoMap[m].Name)
+	return fmt.Errorf("try `mae-routing %s --help` for usage info", infoMap[m].Name)
 }
 
 // newServeV2Command returns a new "serve" subcommand using e as its environment.
@@ -230,9 +230,9 @@ func newServeV2Command(e *serveEnv, subcmd serveMode) *ffcli.Command {
 		Name:      info.Name,
 		ShortHelp: info.ShortHelp,
 		ShortUsage: strings.Join([]string{
-			fmt.Sprintf("tailscale %s <target>", info.Name),
-			fmt.Sprintf("tailscale %s status [--json]", info.Name),
-			fmt.Sprintf("tailscale %s reset", info.Name),
+			fmt.Sprintf("mae-routing %s <target>", info.Name),
+			fmt.Sprintf("mae-routing %s status [--json]", info.Name),
+			fmt.Sprintf("mae-routing %s reset", info.Name),
 		}, "\n"),
 		LongHelp: info.LongHelp + fmt.Sprintf(strings.TrimSpace(serveHelpCommon), info.Name),
 		Exec:     e.runServeCombined(subcmd),
@@ -257,7 +257,7 @@ func newServeV2Command(e *serveEnv, subcmd serveMode) *ffcli.Command {
 			subcmds := []*ffcli.Command{
 				{
 					Name:       "status",
-					ShortUsage: "tailscale " + info.Name + " status [--json]",
+					ShortUsage: "mae-routing " + info.Name + " status [--json]",
 					Exec:       e.runServeStatus,
 					ShortHelp:  "View current " + info.Name + " configuration",
 					FlagSet: e.newFlags("serve-status", func(fs *flag.FlagSet) {
@@ -266,7 +266,7 @@ func newServeV2Command(e *serveEnv, subcmd serveMode) *ffcli.Command {
 				},
 				{
 					Name:       "reset",
-					ShortUsage: "tailscale " + info.Name + " reset",
+					ShortUsage: "mae-routing " + info.Name + " reset",
 					ShortHelp:  "Reset current " + info.Name + " config",
 					Exec:       e.runServeReset,
 					FlagSet:    e.newFlags("serve-reset", nil),
@@ -276,7 +276,7 @@ func newServeV2Command(e *serveEnv, subcmd serveMode) *ffcli.Command {
 				subcmds = append(subcmds, []*ffcli.Command{
 					{
 						Name:       "drain",
-						ShortUsage: fmt.Sprintf("tailscale %s drain <service>", info.Name),
+						ShortUsage: fmt.Sprintf("mae-routing %s drain <service>", info.Name),
 						ShortHelp:  "Drain a service from the current node",
 						LongHelp: "Make the current node no longer accept new connections for the specified service.\n" +
 							"Existing connections will continue to work until they are closed, but no new connections will be accepted.\n" +
@@ -286,24 +286,24 @@ func newServeV2Command(e *serveEnv, subcmd serveMode) *ffcli.Command {
 					},
 					{
 						Name:       "clear",
-						ShortUsage: fmt.Sprintf("tailscale %s clear <service>", info.Name),
+						ShortUsage: fmt.Sprintf("mae-routing %s clear <service>", info.Name),
 						ShortHelp:  "Remove all config for a service",
 						LongHelp:   "Remove all handlers configured for the specified service.",
 						Exec:       e.runServeClear,
 					},
 					{
 						Name:       "advertise",
-						ShortUsage: fmt.Sprintf("tailscale %s advertise <service>", info.Name),
+						ShortUsage: fmt.Sprintf("mae-routing %s advertise <service>", info.Name),
 						ShortHelp:  "Advertise this node as a service proxy to the tailnet",
 						LongHelp: "Advertise this node as a service proxy to the tailnet. This command is used\n" +
 							"to make the current node be considered as a service host for a service. This is\n" +
 							"useful to bring a service back after it has been drained. (i.e. after running \n" +
-							"`tailscale serve drain <service>`). This is not needed if you are using `tailscale serve` to initialize a service.",
+							"`mae-routing serve drain <service>`). This is not needed if you are using `mae-routing serve` to initialize a service.",
 						Exec: e.runServeAdvertise,
 					},
 					{
 						Name:       "get-config",
-						ShortUsage: fmt.Sprintf("tailscale %s get-config <file> [--service=<service>] [--all]", info.Name),
+						ShortUsage: fmt.Sprintf("mae-routing %s get-config <file> [--service=<service>] [--all]", info.Name),
 						ShortHelp:  "Get service configuration to save to a file",
 						LongHelp: "Get the configuration for services that this node is currently hosting in a\n" +
 							"format that can later be provided to set-config. This can be used to declaratively set\n" +
@@ -316,13 +316,13 @@ func newServeV2Command(e *serveEnv, subcmd serveMode) *ffcli.Command {
 					},
 					{
 						Name:       "set-config",
-						ShortUsage: fmt.Sprintf("tailscale %s set-config <file> [--service=<service>] [--all]", info.Name),
+						ShortUsage: fmt.Sprintf("mae-routing %s set-config <file> [--service=<service>] [--all]", info.Name),
 						ShortHelp:  "Define service configuration from a file",
 						LongHelp: "Read the provided configuration file and use it to declaratively set the configuration\n" +
 							"for either a single service, or for all services that this node is hosting. If --service is specified,\n" +
 							"all endpoint handlers for that service are overwritten. If --all is specified, all endpoint handlers for\n" +
 							"all services are overwritten.\n\n" +
-							"For information on the file format, see tailscale.com/kb/1589/tailscale-services-configuration-file",
+							"For information on the file format, see routing.maesuaisystem.com",
 						Exec: e.runServeSetConfig,
 						FlagSet: e.newFlags("serve-set-config", func(fs *flag.FlagSet) {
 							fs.BoolVar(&e.allServices, "all", false, "apply config to all services")
@@ -343,7 +343,7 @@ func (e *serveEnv) validateArgs(subcmd serveMode, args []string) error {
 			fmt.Fprint(e.stderr(), " You can run the following command instead:\n")
 			fmt.Fprintf(e.stderr(), "\t- %s\n", translation)
 		}
-		fmt.Fprint(e.stderr(), "\nPlease see https://tailscale.com/kb/1242/tailscale-serve for more information.\n")
+		fmt.Fprint(e.stderr(), "\nPlease see https://routing.maesuaisystem.com/ for more information.\n")
 		return errHelpFunc(subcmd)
 	}
 	if len(args) == 0 && e.tun {
@@ -826,8 +826,8 @@ func (e *serveEnv) runServeGetConfig(ctx context.Context, args []string) (err er
 const serveConfigDocsURL = "https://tailscale.com/kb/1589/tailscale-services-configuration-file"
 
 const serveLegacyFormatWarning = "Warning: %q is in the legacy raw serve config format " +
-	"(as emitted by `tailscale serve status --json`), which is deprecated for set-config. " +
-	"Applying its services only. To migrate, run `tailscale serve get-config` to save your " +
+	"(as emitted by `mae-routing serve status --json`), which is deprecated for set-config. " +
+	"Applying its services only. To migrate, run `mae-routing serve get-config` to save your " +
 	"configuration in the supported format; see %s\n"
 
 const serveLegacyDroppedWarning = "Warning: ignoring node-level fields not supported by set-config: %s\n"
@@ -1038,11 +1038,11 @@ var (
 	msgServiceWaitingApproval      = "This machine is configured as a service proxy for %s, but approval from an admin is required. Once approved, it will be available in your Tailnet as:"
 	msgRunningInBackground         = "%s started and running in the background."
 	msgRunningTunService           = "IPv4 and IPv6 traffic to %s is being routed to your operating system."
-	msgDisableProxy                = "To disable the proxy, run: tailscale %s --%s=%d off"
-	msgDisableServiceProxy         = "To disable the proxy, run: tailscale serve --service=%s --%s=%d off"
-	msgDisableServiceTun           = "To disable the service in TUN mode, run: tailscale serve --service=%s --tun off"
-	msgDisableService              = "To remove config for the service, run: tailscale serve clear %s"
-	msgWarnRemoteDestCompatibility = "Warning: %s doesn't support connecting to remote destinations from non-default route, see tailscale.com/kb/1552/tailscale-services for detail."
+	msgDisableProxy                = "To disable the proxy, run: mae-routing %s --%s=%d off"
+	msgDisableServiceProxy         = "To disable the proxy, run: mae-routing serve --service=%s --%s=%d off"
+	msgDisableServiceTun           = "To disable the service in TUN mode, run: mae-routing serve --service=%s --tun off"
+	msgDisableService              = "To remove config for the service, run: mae-routing serve clear %s"
+	msgWarnRemoteDestCompatibility = "Warning: %s doesn't support connecting to remote destinations from non-default route, see routing.maesuaisystem.com for detail."
 	msgToExit                      = "Press Ctrl+C to exit."
 )
 
@@ -1240,7 +1240,7 @@ func (e *serveEnv) shouldWarnRemoteDestCompatibility(ctx context.Context, target
 			return nil
 		}
 		if !SOMarkInUse {
-			return fmt.Errorf(msgWarnRemoteDestCompatibility, "the Linux tailscaled without SO_MARK")
+			return fmt.Errorf(msgWarnRemoteDestCompatibility, "the Linux mae-routingd without SO_MARK")
 		}
 	}
 
@@ -1259,7 +1259,7 @@ func (e *serveEnv) applyWebServe(sc *ipn.ServeConfig, dnsName string, srvPort ui
 	case filepath.IsAbs(target):
 		if version.IsMacAppStore() || version.IsMacSys() {
 			// The Tailscale network extension cannot serve arbitrary paths on macOS due to sandbox restrictions (2024-03-26)
-			return errors.New("Path serving is not supported on macOS due to sandbox restrictions. To use Tailscale Serve on macOS, switch to the open-source tailscaled distribution. See https://tailscale.com/kb/1065/macos-variants for more information.")
+			return errors.New("Path serving is not supported on macOS due to sandbox restrictions. To use MAE Routing Serve on macOS, switch to the open-source mae-routingd distribution. See https://routing.maesuaisystem.com/ for more information.")
 		}
 
 		target = filepath.Clean(target)

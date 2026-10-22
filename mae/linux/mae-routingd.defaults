@@ -1,7 +1,7 @@
 # Settings for the MAE Routing daemon (mae-routingd)
 
 # UDP port for WireGuard and peer-to-peer traffic; 0 picks a random free port.
-PORT="41641"
+PORT="41642"
 
 # Extra flags, e.g. FLAGS="--tun=userspace-networking" on machines without /dev/net/tun.
 FLAGS=""

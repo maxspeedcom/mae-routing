@@ -15,13 +15,13 @@ import (
 
 // TODO(will): update URL to KB article when available
 var systrayHelp = strings.TrimSpace(`
-The Tailscale systray app is not included in this client build.
-To run it manually, see https://github.com/tailscale/tailscale/tree/main/cmd/systray
+The MAE Routing systray app is not included in this client build.
+To run it manually, see https://github.com/maxspeedcom/mae-routing/tree/main/cmd/systray
 `)
 
 var systrayCmd = &ffcli.Command{
 	Name:       "systray",
-	ShortUsage: "tailscale systray",
+	ShortUsage: "mae-routing systray",
 	ShortHelp:  "Not available in this client build",
 	LongHelp:   hidden + systrayHelp,
 	Exec: func(_ context.Context, _ []string) error {

@@ -203,7 +203,7 @@ func (lc *Client) doLocalRequestNiceError(req *http.Request) (*http.Response, er
 		if oe, ok := ue.Err.(*net.OpError); ok && oe.Op == "dial" {
 			path := req.URL.Path
 			pathPrefix, _, _ := strings.Cut(path, "?")
-			return nil, fmt.Errorf("Failed to connect to local Tailscale daemon for %s; %s Error: %w", pathPrefix, tailscaledConnectHint(), oe)
+			return nil, fmt.Errorf("Failed to connect to local MAE Routing daemon for %s; %s Error: %w", pathPrefix, tailscaledConnectHint(), oe)
 		}
 	}
 	return nil, err

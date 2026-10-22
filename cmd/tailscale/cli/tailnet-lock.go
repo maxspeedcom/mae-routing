@@ -39,7 +39,7 @@ func init() {
 
 var tailnetLockCmd = &ffcli.Command{
 	Name:       "lock",
-	ShortUsage: "tailscale lock <subcommand> [arguments...]",
+	ShortUsage: "mae-routing lock <subcommand> [arguments...]",
 	ShortHelp:  "Manage tailnet lock",
 	LongHelp:   "Manage tailnet lock",
 	Subcommands: []*ffcli.Command{
@@ -63,7 +63,7 @@ func runTailnetLockNoSubcommand(ctx context.Context, args []string) error {
 		return runTskeyWrapCmd(ctx, args[1:])
 	}
 	if len(args) > 0 {
-		return fmt.Errorf("tailscale lock: unknown subcommand: %s", args[0])
+		return fmt.Errorf("mae-routing lock: unknown subcommand: %s", args[0])
 	}
 
 	return runTailnetLockStatus(ctx, args)
@@ -77,26 +77,26 @@ var nlInitArgs struct {
 
 var tlInitCmd = &ffcli.Command{
 	Name:       "init",
-	ShortUsage: "tailscale lock init [--gen-disablement-for-support] --gen-disablements N <trusted-key>...",
+	ShortUsage: "mae-routing lock init [--gen-disablement-for-support] --gen-disablements N <trusted-key>...",
 	ShortHelp:  "Initialize tailnet lock",
 	LongHelp: strings.TrimSpace(`
 
-The 'tailscale lock init' command initializes tailnet lock for the
+The 'mae-routing lock init' command initializes tailnet lock for the
 entire tailnet. The tailnet lock keys specified are those initially
 trusted to sign nodes or to make further changes to tailnet lock.
 
 You can identify the tailnet lock key for a node you wish to trust by
-running 'tailscale lock' on that node, and copying the node's tailnet
+running 'mae-routing lock' on that node, and copying the node's tailnet
 lock key.
 
-To disable tailnet lock, use the 'tailscale lock disable' command
+To disable tailnet lock, use the 'mae-routing lock disable' command
 along with one of the disablement secrets.
 The number of disablement secrets to be generated is specified using the
 --gen-disablements flag. Initializing tailnet lock requires at least
 one disablement.
 
 If --gen-disablement-for-support is specified, an additional disablement secret
-will be generated and transmitted to Tailscale, which support can use to disable
+will be generated and transmitted to MAE Routing, which support can use to disable
 tailnet lock. We recommend setting this flag.
 
 `),
@@ -104,7 +104,7 @@ tailnet lock. We recommend setting this flag.
 	FlagSet: (func() *flag.FlagSet {
 		fs := newFlagSet("lock init")
 		fs.IntVar(&nlInitArgs.numDisablements, "gen-disablements", 1, "number of disablement secrets to generate")
-		fs.BoolVar(&nlInitArgs.disablementForSupport, "gen-disablement-for-support", false, "generates and transmits a disablement secret for Tailscale support")
+		fs.BoolVar(&nlInitArgs.disablementForSupport, "gen-disablement-for-support", false, "generates and transmits a disablement secret for MAE Routing support")
 		fs.BoolVar(&nlInitArgs.confirm, "confirm", false, "do not prompt for confirmation")
 		return fs
 	})(),
@@ -150,7 +150,7 @@ func runTailnetLockInit(ctx context.Context, args []string) error {
 	if !nlInitArgs.confirm {
 		fmt.Printf("%d disablement secrets will be generated.\n", nlInitArgs.numDisablements)
 		if nlInitArgs.disablementForSupport {
-			fmt.Println("A disablement secret will be generated and transmitted to Tailscale support.")
+			fmt.Println("A disablement secret will be generated and transmitted to MAE Routing support.")
 		}
 
 		genSupportFlag := ""
@@ -182,7 +182,7 @@ func runTailnetLockInit(ctx context.Context, args []string) error {
 			return err
 		}
 		disablementValues = append(disablementValues, tka.DisablementKDF(supportDisablement))
-		fmt.Fprintln(&successMsg, "A disablement secret for Tailscale support has been generated and transmitted to Tailscale.")
+		fmt.Fprintln(&successMsg, "A disablement secret for MAE Routing support has been generated and transmitted to MAE Routing.")
 	}
 
 	// The state returned by TailnetLockInit likely doesn't contain the initialized state,
@@ -202,7 +202,7 @@ var nlStatusArgs struct {
 
 var tlStatusCmd = &ffcli.Command{
 	Name:       "status",
-	ShortUsage: "tailscale lock status",
+	ShortUsage: "mae-routing lock status",
 	ShortHelp:  "Output the state of tailnet lock",
 	Exec:       runTailnetLockStatus,
 	FlagSet: (func() *flag.FlagSet {
@@ -214,7 +214,7 @@ var tlStatusCmd = &ffcli.Command{
 
 func runTailnetLockStatus(ctx context.Context, args []string) error {
 	if len(args) > 0 {
-		return fmt.Errorf("tailscale lock status: unexpected argument")
+		return fmt.Errorf("mae-routing lock status: unexpected argument")
 	}
 
 	st, err := localClient.TailnetLockStatus(ctx)
@@ -310,7 +310,7 @@ func printTailnetLockStatus(st *ipnstate.TailnetLockStatus, out io.Writer, jsonS
 
 var tlAddCmd = &ffcli.Command{
 	Name:       "add",
-	ShortUsage: "tailscale lock add <public-key>...",
+	ShortUsage: "mae-routing lock add <public-key>...",
 	ShortHelp:  "Add one or more trusted signing keys to tailnet lock",
 	Exec:       runTailnetLockAdd,
 }
@@ -321,7 +321,7 @@ var nlRemoveArgs struct {
 
 var tlRemoveCmd = &ffcli.Command{
 	Name:       "remove",
-	ShortUsage: "tailscale lock remove [--re-sign=false] <public-key>...",
+	ShortUsage: "mae-routing lock remove [--re-sign=false] <public-key>...",
 	ShortHelp:  "Remove one or more trusted signing keys from tailnet lock",
 	Exec:       runTailnetLockRemove,
 	FlagSet: (func() *flag.FlagSet {
@@ -347,7 +347,7 @@ func runTailnetLockRemove(ctx context.Context, args []string) error {
 		return errors.New("tailnet lock is not enabled")
 	}
 	if len(st.TrustedKeys) == 1 {
-		return errors.New("cannot remove the last trusted signing key; use 'tailscale lock disable' to disable tailnet lock instead, or add another signing key before removing one")
+		return errors.New("cannot remove the last trusted signing key; use 'mae-routing lock disable' to disable tailnet lock instead, or add another signing key before removing one")
 	}
 
 	if nlRemoveArgs.resign {
@@ -394,7 +394,7 @@ func runTailnetLockRemove(ctx context.Context, args []string) error {
 			fmt.Printf(`Warning
 Removal of a signing key(s) without resigning nodes (--re-sign=false)
 will cause any nodes signed by the given key(s) to be locked out
-of the Tailscale network. Proceed with caution.
+of the MAE Routing network. Proceed with caution.
 `)
 			if !prompt.YesNo("Are you sure you want to remove the signing key(s)?", true) {
 				fmt.Printf("aborting removal of signing key(s)\n")
@@ -478,7 +478,7 @@ func runTailnetLockAdd(ctx context.Context, addArgs []string) error {
 
 var tlSignCmd = &ffcli.Command{
 	Name:       "sign",
-	ShortUsage: "tailscale lock sign <node-key> [<rotation-key>]\ntailscale lock sign <auth-key>",
+	ShortUsage: "mae-routing lock sign <node-key> [<rotation-key>]\ntailscale lock sign <auth-key>",
 	ShortHelp:  "Sign a node or pre-approved auth key",
 	LongHelp: `Either:
   - signs a node key and transmits the signature to the coordination
@@ -515,7 +515,7 @@ func runTailnetLockSign(ctx context.Context, args []string) error {
 	)
 
 	if len(args) == 0 || len(args) > 2 {
-		return errors.New("usage: tailscale lock sign <node-key> [<rotation-key>]")
+		return errors.New("usage: mae-routing lock sign <node-key> [<rotation-key>]")
 	}
 	if err := nodeKey.UnmarshalText([]byte(args[0])); err != nil {
 		return fmt.Errorf("decoding node-key: %w", err)
@@ -540,11 +540,11 @@ func runTailnetLockSign(ctx context.Context, args []string) error {
 
 var tlDisableCmd = &ffcli.Command{
 	Name:       "disable",
-	ShortUsage: "tailscale lock disable <disablement-secret>",
+	ShortUsage: "mae-routing lock disable <disablement-secret>",
 	ShortHelp:  "Consume a disablement secret to shut down tailnet lock for the tailnet",
 	LongHelp: strings.TrimSpace(`
 
-The 'tailscale lock disable' command uses the specified disablement
+The 'mae-routing lock disable' command uses the specified disablement
 secret to disable tailnet lock.
 
 If tailnet lock is re-enabled, new disablement secrets can be generated.
@@ -562,18 +562,18 @@ func runTailnetLockDisable(ctx context.Context, args []string) error {
 		return err
 	}
 	if len(secrets) != 1 {
-		return errors.New("usage: tailscale lock disable <disablement-secret>")
+		return errors.New("usage: mae-routing lock disable <disablement-secret>")
 	}
 	return localClient.TailnetLockDisable(ctx, secrets[0])
 }
 
 var tlLocalDisableCmd = &ffcli.Command{
 	Name:       "local-disable",
-	ShortUsage: "tailscale lock local-disable",
+	ShortUsage: "mae-routing lock local-disable",
 	ShortHelp:  "Disable tailnet lock for this node only",
 	LongHelp: strings.TrimSpace(`
 
-The 'tailscale lock local-disable' command disables tailnet lock for only
+The 'mae-routing lock local-disable' command disables tailnet lock for only
 the current node.
 
 If the current node is locked out, this does not mean that it can initiate
@@ -591,7 +591,7 @@ func runTailnetLockLocalDisable(ctx context.Context, args []string) error {
 
 var tlDisablementKDFCmd = &ffcli.Command{
 	Name:       "disablement-kdf",
-	ShortUsage: "tailscale lock disablement-kdf <hex-encoded-disablement-secret>",
+	ShortUsage: "mae-routing lock disablement-kdf <hex-encoded-disablement-secret>",
 	ShortHelp:  "Compute a disablement value from a disablement secret (advanced users only)",
 	LongHelp:   "Compute a disablement value from a disablement secret (advanced users only)",
 	Exec:       runTailnetLockDisablementKDF,
@@ -599,7 +599,7 @@ var tlDisablementKDFCmd = &ffcli.Command{
 
 func runTailnetLockDisablementKDF(ctx context.Context, args []string) error {
 	if len(args) != 1 {
-		return errors.New("usage: tailscale lock disablement-kdf <hex-encoded-disablement-secret>")
+		return errors.New("usage: mae-routing lock disablement-kdf <hex-encoded-disablement-secret>")
 	}
 	secret, err := hex.DecodeString(args[0])
 	if err != nil {
@@ -616,7 +616,7 @@ var nlLogArgs struct {
 
 var tlLogCmd = &ffcli.Command{
 	Name:       "log",
-	ShortUsage: "tailscale lock log [--limit N]",
+	ShortUsage: "mae-routing lock log [--limit N]",
 	ShortHelp:  "List changes applied to tailnet lock",
 	LongHelp:   "List changes applied to tailnet lock",
 	Exec:       runTailnetLockLog,
@@ -746,7 +746,7 @@ func printTailnetLockLog(updates []ipnstate.NetworkLockUpdate, out io.Writer, js
 
 func runTskeyWrapCmd(ctx context.Context, args []string) error {
 	if len(args) != 1 {
-		return errors.New("usage: lock tskey-wrap <tailscale pre-auth key>")
+		return errors.New("usage: lock tskey-wrap <mae-routing pre-auth key>")
 	}
 	if strings.Contains(args[0], "--TL") {
 		return errors.New("Error: provided key was already wrapped")
@@ -805,16 +805,16 @@ var tlRevokeKeysArgs struct {
 
 var tlRevokeKeysCmd = &ffcli.Command{
 	Name:       "revoke-keys",
-	ShortUsage: "tailscale lock revoke-keys <tailnet-lock-key>...\n  revoke-keys [--cosign] [--finish] <recovery-blob>",
+	ShortUsage: "mae-routing lock revoke-keys <tailnet-lock-key>...\n  revoke-keys [--cosign] [--finish] <recovery-blob>",
 	ShortHelp:  "Revoke compromised tailnet-lock keys",
 	LongHelp: `Retroactively revoke the specified tailnet lock keys (tlpub:abc).
 
 Revoked keys are prevented from being used in the future. Any nodes previously signed
 by revoked keys lose their authorization and must be signed again.
 
-Revocation is a multi-step process that requires several signing nodes to ` + "`--cosign`" + ` the revocation. Use ` + "`tailscale lock remove`" + ` instead if the key has not been compromised.
+Revocation is a multi-step process that requires several signing nodes to ` + "`--cosign`" + ` the revocation. Use ` + "`mae-routing lock remove`" + ` instead if the key has not been compromised.
 
-1. To start, run ` + "`tailscale revoke-keys <tlpub-keys>`" + ` with the tailnet lock keys to revoke.
+1. To start, run ` + "`mae-routing revoke-keys <tlpub-keys>`" + ` with the tailnet lock keys to revoke.
 2. Re-run the ` + "`--cosign`" + ` command output by ` + "`revoke-keys`" + ` on other signing nodes. Use the
    most recent command output on the next signing node in sequence.
 3. Once the number of ` + "`--cosign`" + `s is greater than the number of keys being revoked,

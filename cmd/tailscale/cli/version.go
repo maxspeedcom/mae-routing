@@ -17,13 +17,13 @@ import (
 
 var versionCmd = &ffcli.Command{
 	Name:       "version",
-	ShortUsage: "tailscale version [flags]",
-	ShortHelp:  "Print Tailscale version",
+	ShortUsage: "mae-routing version [flags]",
+	ShortHelp:  "Print MAE Routing version",
 	FlagSet: (func() *flag.FlagSet {
 		fs := newFlagSet("version")
 		fs.BoolVar(&versionArgs.daemon, "daemon", false, "also print local node's daemon version")
 		fs.BoolVar(&versionArgs.json, "json", false, "output in JSON format")
-		fs.BoolVar(&versionArgs.upstream, "upstream", false, "fetch and print the latest upstream release version from pkgs.tailscale.com")
+		fs.BoolVar(&versionArgs.upstream, "upstream", false, "fetch and print the latest upstream release version from the upstream package server")
 		fs.StringVar(&versionArgs.track, "track", "", `which track to check for updates: "stable", "release-candidate", or "unstable" (dev); empty means same as current`)
 		return fs
 	})(),

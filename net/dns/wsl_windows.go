@@ -109,7 +109,7 @@ func (wm *wslManager) SetDNS(cfg OSConfig) error {
 }
 
 const wslConf = "/etc/wsl.conf"
-const wslConfSection = `# added by tailscale
+const wslConfSection = `# added by mae-routing
 [network]
 generateResolvConf = false
 `

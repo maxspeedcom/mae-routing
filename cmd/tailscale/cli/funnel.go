@@ -42,11 +42,11 @@ func newFunnelCommand(e *serveEnv) *ffcli.Command {
 		Name:      "funnel",
 		ShortHelp: "Turn on/off Funnel service",
 		ShortUsage: strings.Join([]string{
-			"tailscale funnel <serve-port> {on|off}",
-			"tailscale funnel status [--json]",
+			"mae-routing funnel <serve-port> {on|off}",
+			"mae-routing funnel status [--json]",
 		}, "\n"),
 		LongHelp: strings.Join([]string{
-			"Funnel allows you to publish a 'tailscale serve'",
+			"Funnel allows you to publish a 'mae-routing serve'",
 			"server publicly, open to the entire internet.",
 			"",
 			"Turning off Funnel only turns off serving to the internet.",
@@ -57,7 +57,7 @@ func newFunnelCommand(e *serveEnv) *ffcli.Command {
 			{
 				Name:       "status",
 				Exec:       e.runServeStatus,
-				ShortUsage: "tailscale funnel status [--json]",
+				ShortUsage: "mae-routing funnel status [--json]",
 				ShortHelp:  "Show current serve/funnel status",
 				FlagSet: e.newFlags("funnel-status", func(fs *flag.FlagSet) {
 					fs.BoolVar(&e.json, "json", false, "output JSON")
@@ -177,7 +177,7 @@ func printFunnelWarning(sc *ipn.ServeConfig) {
 		}
 	}
 	if warn {
-		fmt.Fprintf(Stderr, "         run: `tailscale serve --help` to see how to configure handlers\n")
+		fmt.Fprintf(Stderr, "         run: `mae-routing serve --help` to see how to configure handlers\n")
 	}
 }
 

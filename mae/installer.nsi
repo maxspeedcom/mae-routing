@@ -22,7 +22,7 @@ VIAddVersionKey /LANG=0 "FileDescription" "MAE Routing Setup"
 VIAddVersionKey /LANG=0 "CompanyName" "MAE Routing (maesuaisystem.com)"
 VIAddVersionKey /LANG=0 "FileVersion" "${VERSION}.${BUILD}"
 VIAddVersionKey /LANG=0 "ProductVersion" "${VERSION}.${BUILD}"
-VIAddVersionKey /LANG=0 "LegalCopyright" "© 2026 MAE Routing · portions © Tailscale Inc & contributors (BSD-3-Clause)"
+VIAddVersionKey /LANG=0 "LegalCopyright" "© 2026 MAE Routing"
 
 !include "MUI2.nsh"
 !include "LogicLib.nsh"
@@ -61,14 +61,6 @@ Function .onInit
     Abort
   ${EndIf}
   SetRegView 64
-  ; a real Tailscale on the same machine fights over 100.64.0.0/10 and 100.100.100.100
-  nsExec::ExecToStack 'sc.exe query Tailscale'
-  Pop $0
-  Pop $1
-  ${If} $0 == 0
-    MessageBox MB_YESNO|MB_ICONEXCLAMATION "พบโปรแกรม Tailscale ในเครื่องนี้$\r$\n$\r$\nMAE Routing กับ Tailscale ใช้ช่วง IP เดียวกัน จึงไม่ควรเชื่อมต่อพร้อมกัน ให้ตัดการเชื่อมต่อ Tailscale ก่อนใช้ MAE Routing$\r$\n$\r$\nติดตั้งต่อหรือไม่?" IDYES +2
-    Abort
-  ${EndIf}
 FunctionEnd
 
 Function LaunchTray
@@ -92,7 +84,7 @@ Section "MAE Routing" SecMain
   File "${SRCDIR}\mae-routing.exe"
   File "${SRCDIR}\${EXE}"
   File "${SRCDIR}\wintun.dll"
-  File "${SRCDIR}\LICENSE-tailscale.txt"
+  File "${SRCDIR}\THIRD-PARTY-NOTICES.txt"
   File "${SRCDIR}\LICENSE-wintun.txt"
   File "${ASSETS}\MAERouting.ico"
 
@@ -112,6 +104,10 @@ Section "MAE Routing" SecMain
   nsExec::ExecToLog 'net.exe start ${SVC}'
 
   WriteRegStr HKLM "${RUNKEY}" "${APP}" '"$INSTDIR\${EXE}"'
+  ; "mae-routing" in Command Prompt / PowerShell
+  InitPluginsDir
+  File "/oname=$PLUGINSDIR\path.ps1" "${SRCDIR}\..\..\windows\path.ps1"
+  nsExec::Exec 'powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$PLUGINSDIR\path.ps1" -Dir "$INSTDIR"'
   CreateShortcut "$SMPROGRAMS\${APP}.lnk" "$INSTDIR\${EXE}" "" "$INSTDIR\MAERouting.ico"
 
   WriteUninstaller "$INSTDIR\uninstall.exe"
@@ -138,13 +134,16 @@ Section "Uninstall"
   SetShellVarContext all
   nsExec::Exec 'taskkill.exe /F /IM ${EXE}'
   nsExec::Exec 'net.exe stop ${SVC}'
+  InitPluginsDir
+  File "/oname=$PLUGINSDIR\path.ps1" "${SRCDIR}\..\..\windows\path.ps1"
+  nsExec::Exec 'powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$PLUGINSDIR\path.ps1" -Dir "$INSTDIR" -Remove'
   nsExec::ExecToLog '"$INSTDIR\maeroutingd.exe" uninstall-system-daemon'
   Sleep 1000
   Delete "$INSTDIR\maeroutingd.exe"
   Delete "$INSTDIR\mae-routing.exe"
   Delete "$INSTDIR\${EXE}"
   Delete "$INSTDIR\wintun.dll"
-  Delete "$INSTDIR\LICENSE-tailscale.txt"
+  Delete "$INSTDIR\THIRD-PARTY-NOTICES.txt"
   Delete "$INSTDIR\LICENSE-wintun.txt"
   Delete "$INSTDIR\MAERouting.ico"
   Delete "$INSTDIR\uninstall.exe"

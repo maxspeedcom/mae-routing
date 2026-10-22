@@ -24,7 +24,7 @@ func init() {
 func mkDebugCaptureCmd() *ffcli.Command {
 	return &ffcli.Command{
 		Name:       "capture",
-		ShortUsage: "tailscale debug capture",
+		ShortUsage: "mae-routing debug capture",
 		Exec:       runCapture,
 		ShortHelp:  "Stream pcaps for debugging",
 		FlagSet: (func() *flag.FlagSet {

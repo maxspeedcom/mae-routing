@@ -26,7 +26,7 @@ var configSystrayArgs struct {
 func systrayConfigCmd() *ffcli.Command {
 	return &ffcli.Command{
 		Name:       "systray",
-		ShortUsage: "tailscale configure systray [options]",
+		ShortUsage: "mae-routing configure systray [options]",
 		ShortHelp:  "[ALPHA] Manage the systray client for Linux",
 		LongHelp:   "[ALPHA] The systray set of commands provides a way to configure the systray application on Linux.",
 		Exec:       configureSystray,

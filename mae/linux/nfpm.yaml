@@ -9,12 +9,10 @@ priority: optional
 maintainer: MAE Routing <support@maesuaisystem.com>
 description: |
   MAE Routing: connect this machine to your organisation's private network
-  (routing.maesuaisystem.com). WireGuard-based mesh VPN, based on Tailscale.
+  (routing.maesuaisystem.com). WireGuard-based mesh VPN.
 vendor: MAE Routing
 homepage: https://routing.maesuaisystem.com/
 license: BSD-3-Clause
-conflicts:
-  - tailscale
 contents:
   - src: ${SRC}/mae-routing
     dst: /usr/bin/mae-routing
@@ -25,8 +23,8 @@ contents:
   - src: ${SRC}/mae-routingd.defaults
     dst: /etc/default/mae-routingd
     type: config|noreplace
-  - src: ${SRC}/LICENSE-tailscale.txt
-    dst: /usr/share/doc/mae-routing/LICENSE-tailscale.txt
+  - src: ${SRC}/THIRD-PARTY-NOTICES.txt
+    dst: /usr/share/doc/mae-routing/THIRD-PARTY-NOTICES.txt
   - dst: /var/lib/mae-routing
     type: dir
     file_info:

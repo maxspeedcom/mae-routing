@@ -194,7 +194,7 @@ func (r *freebsdRouter) buildPFNATRules() (string, error) {
 			}
 		}
 		if has4 {
-			fmt.Fprintf(&b, "nat on %s inet from 100.64.0.0/10 to any -> (%s)\n", iface.Name, iface.Name)
+			fmt.Fprintf(&b, "nat on %s inet from 10.77.0.0/16 to any -> (%s)\n", iface.Name, iface.Name)
 		}
 		if has6 {
 			fmt.Fprintf(&b, "nat on %s inet6 from fd7a:115c:a1e0::/48 to any -> (%s)\n", iface.Name, iface.Name)

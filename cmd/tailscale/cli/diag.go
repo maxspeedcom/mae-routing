@@ -52,23 +52,23 @@ func fixTailscaledConnectErrorImpl(origErr error) error {
 			// The socket is there, or something else went wrong, so the
 			// error itself is informative: a Windows named pipe owned by
 			// another user, for example. Don't hide it.
-			return fmt.Errorf("failed to connect to local tailscaled (no tailscaled process found): %w", origErr)
+			return fmt.Errorf("failed to connect to local mae-routingd (no mae-routingd process found): %w", origErr)
 		}
 		switch runtime.GOOS {
 		case "windows":
-			return fmt.Errorf("failed to connect to local tailscaled process; is the Tailscale service running?")
+			return fmt.Errorf("failed to connect to local mae-routingd process; is the MAE Routing service running?")
 		case "darwin":
-			return fmt.Errorf("failed to connect to local Tailscale service; is Tailscale running?")
+			return fmt.Errorf("failed to connect to local MAE Routing service; is MAE Routing running?")
 		case "linux":
 			var hint string
 			if isSystemdSystem() {
-				hint = " (sudo systemctl start tailscaled ?)"
+				hint = " (sudo systemctl start mae-routingd ?)"
 			}
-			return fmt.Errorf("failed to connect to local tailscaled; it doesn't appear to be running%s", hint)
+			return fmt.Errorf("failed to connect to local mae-routingd; it doesn't appear to be running%s", hint)
 		}
-		return fmt.Errorf("failed to connect to local tailscaled process; it doesn't appear to be running")
+		return fmt.Errorf("failed to connect to local mae-routingd process; it doesn't appear to be running")
 	}
-	return fmt.Errorf("failed to connect to local tailscaled (which appears to be running as %v, pid %v). Got error: %w", foundProc.Executable(), foundProc.Pid(), origErr)
+	return fmt.Errorf("failed to connect to local mae-routingd (which appears to be running as %v, pid %v). Got error: %w", foundProc.Executable(), foundProc.Pid(), origErr)
 }
 
 // isSystemdSystem reports whether the current machine uses systemd

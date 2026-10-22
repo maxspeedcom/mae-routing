@@ -302,7 +302,7 @@ var OSConfigurationReadWarnable = health.Register(&health.Warnable{
 	Code:  "dns-read-os-config-failed",
 	Title: "Failed to read system DNS configuration",
 	Text: func(args health.Args) string {
-		return fmt.Sprintf("Tailscale failed to fetch the DNS configuration of your device: %v", args[health.ArgError])
+		return fmt.Sprintf("MAE Routing failed to fetch the DNS configuration of your device: %v", args[health.ArgError])
 	},
 	Severity:  health.SeverityLow,
 	DependsOn: []*health.Warnable{health.NetworkStatusWarnable},
@@ -314,7 +314,7 @@ var OSConfigurationReadWarnable = health.Register(&health.Warnable{
 var EmptyBaseConfigWarnable = health.Register(&health.Warnable{
 	Code:      "dns-empty-base-config",
 	Title:     "Waiting for system DNS configuration",
-	Text:      health.StaticMessage("Your device has no system DNS servers for Tailscale to forward queries to, so Tailscale has left DNS alone. MagicDNS stays inactive until the system has DNS servers of its own."),
+	Text:      health.StaticMessage("Your device has no system DNS servers for MAE Routing to forward queries to, so MAE Routing has left DNS alone. MagicDNS stays inactive until the system has DNS servers of its own."),
 	Severity:  health.SeverityMedium,
 	DependsOn: []*health.Warnable{health.NetworkStatusWarnable},
 })
@@ -323,7 +323,7 @@ var osConfigurationSetWarnable = health.Register(&health.Warnable{
 	Code:  "dns-set-os-config-failed",
 	Title: "Failed to set system DNS configuration",
 	Text: func(args health.Args) string {
-		return fmt.Sprintf("Tailscale failed to set the DNS configuration of your device: %v", args[health.ArgError])
+		return fmt.Sprintf("MAE Routing failed to set the DNS configuration of your device: %v", args[health.ArgError])
 	},
 	Severity:  health.SeverityMedium,
 	DependsOn: []*health.Warnable{health.NetworkStatusWarnable},

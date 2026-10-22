@@ -29,10 +29,10 @@ func jetKVMConfigureCmd() *ffcli.Command {
 	return &ffcli.Command{
 		Name:       "jetkvm",
 		Exec:       runConfigureJetKVM,
-		ShortUsage: "tailscale configure jetkvm",
-		ShortHelp:  "Configure JetKVM to run tailscaled at boot",
+		ShortUsage: "mae-routing configure jetkvm",
+		ShortHelp:  "Configure JetKVM to run mae-routingd at boot",
 		LongHelp: strings.TrimSpace(`
-This command configures the JetKVM host to run tailscaled at boot.
+This command configures the JetKVM host to run mae-routingd at boot.
 `),
 		FlagSet: (func() *flag.FlagSet {
 			fs := newFlagSet("jetkvm")
@@ -54,14 +54,14 @@ func runConfigureJetKVM(ctx context.Context, args []string) error {
 	err := os.WriteFile("/userdata/init.d/S22tailscale", bytes.TrimLeft([]byte(`
 #!/bin/sh
 # /userdata/init.d/S22tailscale
-# Start/stop tailscaled
+# Start/stop mae-routingd
 
 case "$1" in
   start)
-    /userdata/tailscale/tailscaled > /dev/null 2>&1 &
+    /userdata/tailscale/mae-routingd > /dev/null 2>&1 &
     ;;
   stop)
-    killall tailscaled
+    killall mae-routingd
     ;;
   *)
     echo "Usage: $0 {start|stop}"

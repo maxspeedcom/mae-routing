@@ -20,36 +20,36 @@ import (
 
 var waitCmd = &ffcli.Command{
 	Name:      "wait",
-	ShortHelp: "Wait for Tailscale interface/IPs to be ready for binding",
+	ShortHelp: "Wait for MAE Routing interface/IPs to be ready for binding",
 	LongHelp: strings.TrimSpace(`
-Wait for Tailscale resources to be available. As of 2026-01-02, the only
-resource that's available to wait for by is the Tailscale interface and its
+Wait for MAE Routing resources to be available. As of 2026-01-02, the only
+resource that's available to wait for by is the MAE Routing interface and its
 IPs.
 
-With no arguments, this command will block until tailscaled is up, its backend is running,
-and the Tailscale interface is up and has a Tailscale IP address assigned to it.
+With no arguments, this command will block until mae-routingd is up, its backend is running,
+and the MAE Routing interface is up and has a MAE Routing IP address assigned to it.
 
-If running in userspace-networking mode, this command only waits for tailscaled and
+If running in userspace-networking mode, this command only waits for mae-routingd and
 the Running state, as no physical network interface exists.
 
 A future version of this command may support waiting for other types of resources.
 
 The command returns exit code 0 on success, and non-zero on failure or timeout.
 
-To wait on a specific type of IP address, use 'tailscale ip' in combination with
-the 'tailscale wait' command. For example, to wait for an IPv4 address:
+To wait on a specific type of IP address, use 'mae-routing ip' in combination with
+the 'mae-routing wait' command. For example, to wait for an IPv4 address:
 
-    tailscale wait && tailscale ip --assert=<specific-IP-address>
+    mae-routing wait && mae-routing ip --assert=<specific-IP-address>
 
 Linux systemd users can wait for the "tailscale-online.target" target, which runs
 this command.
 
-More generally, a service that wants to bind to (listen on) a Tailscale interface or IP address
-can run it like 'tailscale wait && /path/to/service [...]' to ensure that Tailscale is ready
+More generally, a service that wants to bind to (listen on) a MAE Routing interface or IP address
+can run it like 'mae-routing wait && /path/to/service [...]' to ensure that MAE Routing is ready
 before the program starts.
 `),
 
-	ShortUsage: "tailscale wait",
+	ShortUsage: "mae-routing wait",
 	Exec:       runWait,
 	FlagSet: (func() *flag.FlagSet {
 		fs := newFlagSet("wait")

@@ -27,16 +27,16 @@ func init() {
 		return &ffcli.Command{
 			Name:       "syspolicy",
 			ShortHelp:  "Diagnose the MDM and system policy configuration",
-			LongHelp:   "The 'tailscale syspolicy' command provides tools for diagnosing the MDM and system policy configuration.",
-			ShortUsage: "tailscale syspolicy <subcommand>",
+			LongHelp:   "The 'mae-routing syspolicy' command provides tools for diagnosing the MDM and system policy configuration.",
+			ShortUsage: "mae-routing syspolicy <subcommand>",
 			UsageFunc:  usageFuncNoDefaultValues,
 			Subcommands: []*ffcli.Command{
 				{
 					Name:       "list",
-					ShortUsage: "tailscale syspolicy list",
+					ShortUsage: "mae-routing syspolicy list",
 					Exec:       runSysPolicyList,
 					ShortHelp:  "Print effective policy settings",
-					LongHelp:   "The 'tailscale syspolicy list' subcommand displays the effective policy settings and their sources (e.g., MDM or environment variables).",
+					LongHelp:   "The 'mae-routing syspolicy list' subcommand displays the effective policy settings and their sources (e.g., MDM or environment variables).",
 					FlagSet: (func() *flag.FlagSet {
 						fs := newFlagSet("syspolicy list")
 						fs.BoolVar(&syspolicyArgs.json, "json", false, "output in JSON format")
@@ -45,10 +45,10 @@ func init() {
 				},
 				{
 					Name:       "reload",
-					ShortUsage: "tailscale syspolicy reload",
+					ShortUsage: "mae-routing syspolicy reload",
 					Exec:       runSysPolicyReload,
 					ShortHelp:  "Force a reload of policy settings, even if no changes are detected, and prints the result",
-					LongHelp:   "The 'tailscale syspolicy reload' subcommand forces a reload of policy settings, even if no changes are detected, and prints the result.",
+					LongHelp:   "The 'mae-routing syspolicy reload' subcommand forces a reload of policy settings, even if no changes are detected, and prints the result.",
 					FlagSet: (func() *flag.FlagSet {
 						fs := newFlagSet("syspolicy reload")
 						fs.BoolVar(&syspolicyArgs.json, "json", false, "output in JSON format")

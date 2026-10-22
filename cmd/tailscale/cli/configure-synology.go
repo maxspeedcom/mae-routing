@@ -33,7 +33,7 @@ func configureHostCmd() *ffcli.Command {
 	return &ffcli.Command{
 		Name:       "configure-host",
 		Exec:       runConfigureSynology,
-		ShortUsage: "tailscale configure-host\n" + synologyConfigureCmd.ShortUsage,
+		ShortUsage: "mae-routing configure-host\n" + synologyConfigureCmd.ShortUsage,
 		ShortHelp:  synologyConfigureCmd.ShortHelp,
 		LongHelp:   hidden + synologyConfigureCmd.LongHelp,
 		FlagSet: (func() *flag.FlagSet {
@@ -50,14 +50,14 @@ func synologyConfigureCmd() *ffcli.Command {
 	return &ffcli.Command{
 		Name:       "synology",
 		Exec:       runConfigureSynology,
-		ShortUsage: "tailscale configure synology",
+		ShortUsage: "mae-routing configure synology",
 		ShortHelp:  "Configure Synology to enable outbound connections",
 		LongHelp: strings.TrimSpace(`
 This command is intended to run at boot as root on a Synology device to
-create the /dev/net/tun device and give the tailscaled binary permission
+create the /dev/net/tun device and give the mae-routingd binary permission
 to use it.
 
-See: https://tailscale.com/s/synology-outbound
+See: https://routing.maesuaisystem.com/
 `),
 		FlagSet: (func() *flag.FlagSet {
 			fs := newFlagSet("synology")
@@ -104,13 +104,13 @@ func runConfigureSynology(ctx context.Context, args []string) error {
 	const daemonBin = "/var/packages/Tailscale/target/bin/tailscaled"
 	if _, err := os.Stat(daemonBin); err != nil {
 		if os.IsNotExist(err) {
-			return fmt.Errorf("tailscaled binary not found at %s. Is the Tailscale *.spk package installed?", daemonBin)
+			return fmt.Errorf("mae-routingd binary not found at %s. Is the MAE Routing *.spk package installed?", daemonBin)
 		}
 		return err
 	}
 	if out, err := exec.Command("/bin/setcap", "cap_net_admin,cap_net_raw+eip", daemonBin).CombinedOutput(); err != nil {
 		return fmt.Errorf("setcap: %v, %s", err, out)
 	}
-	printf("Done. To restart Tailscale to use the new permissions, run:\n\n  sudo synosystemctl restart pkgctl-Tailscale.service\n\n")
+	printf("Done. To restart MAE Routing to use the new permissions, run:\n\n  sudo synosystemctl restart pkgctl-Tailscale.service\n\n")
 	return nil
 }

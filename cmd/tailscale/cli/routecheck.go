@@ -31,9 +31,9 @@ func init() {
 var routecheckCmd = func() *ffcli.Command {
 	return &ffcli.Command{
 		Name:       "routecheck",
-		ShortUsage: "tailscale routecheck",
+		ShortUsage: "mae-routing routecheck",
 		ShortHelp:  "Print a reachability report for routes with multiple paths",
-		LongHelp:   hidden + `"tailscale routecheck" is an experimental feature; it is not a stable interface`,
+		LongHelp:   hidden + `"mae-routing routecheck" is an experimental feature; it is not a stable interface`,
 		Exec:       runRoutecheck,
 		FlagSet:    routecheckFlagSet,
 	}

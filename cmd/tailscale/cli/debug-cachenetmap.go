@@ -16,7 +16,7 @@ func init() {
 	debugClearNetmapCacheCmd = func() *ffcli.Command {
 		return &ffcli.Command{
 			Name:       "clear-netmap-cache",
-			ShortUsage: "tailscale debug clear-netmap-cache",
+			ShortUsage: "mae-routing debug clear-netmap-cache",
 			ShortHelp:  "Remove and discard cached network maps (if any)",
 			Exec:       runDebugClearNetmapCache,
 		}
