@@ -1,0 +1,4 @@
+out/
+__pycache__/
+publish-linux.sh
+publish-windows.sh

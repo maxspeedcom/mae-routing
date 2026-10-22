@@ -1,0 +1,53 @@
+# Builds the MAE Routing container image for linux/amd64, linux/arm64 and linux/arm/v7
+# and pushes ghcr.io/maxspeedcom/mae-routing:<version>-<build> and :latest.
+name: mae-docker
+on:
+  workflow_dispatch:
+    inputs:
+      build:
+        description: MAE build number
+        default: "1"
+  push:
+    tags: ["mae-v*"]
+permissions:
+  contents: read
+  packages: write
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Cross-compile binaries
+        run: |
+          UP=$(cat VERSION.txt)
+          B="${{ inputs.build || '1' }}"
+          echo "TAG=$UP-$B" >> "$GITHUB_ENV"
+          LDF="-s -w -X tailscale.com/version.longStamp=$UP-mae$B -X tailscale.com/version.shortStamp=$UP"
+          for A in amd64 arm64 arm; do
+            O=dist/linux_$A
+            mkdir -p $O
+            CGO_ENABLED=0 GOOS=linux GOARCH=$A GOARM=7 go build -trimpath -tags ts_omit_logtail,ts_omit_clientupdate -ldflags "$LDF" -o $O/mae-routing ./cmd/tailscale
+            CGO_ENABLED=0 GOOS=linux GOARCH=$A GOARM=7 go build -trimpath -tags ts_omit_logtail,ts_omit_clientupdate -ldflags "$LDF" -o $O/mae-routingd ./cmd/tailscaled
+            CGO_ENABLED=0 GOOS=linux GOARCH=$A GOARM=7 go build -trimpath -tags ts_omit_logtail,ts_omit_clientupdate -ldflags "$LDF" -o $O/containerboot ./cmd/containerboot
+          done
+          ls -la dist/*
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: mae/docker/Dockerfile
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          push: true
+          tags: |
+            ghcr.io/maxspeedcom/mae-routing:${{ env.TAG }}
+            ghcr.io/maxspeedcom/mae-routing:latest

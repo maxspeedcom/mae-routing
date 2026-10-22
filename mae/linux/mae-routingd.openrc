@@ -1,0 +1,26 @@
+#!/sbin/openrc-run
+# MAE Routing node agent (Alpine and other OpenRC systems)
+
+description="MAE Routing node agent"
+[ -f /etc/default/mae-routingd ] && . /etc/default/mae-routingd
+command="/usr/sbin/mae-routingd"
+command_args="--state=/var/lib/mae-routing/mae-routingd.state --socket=/run/mae-routing/mae-routingd.sock --port=${PORT:-41641} ${FLAGS}"
+command_background=true
+pidfile="/run/${RC_SVCNAME}.pid"
+output_log="/var/log/mae-routingd.log"
+error_log="/var/log/mae-routingd.log"
+
+depend() {
+	need net
+	after firewall
+}
+
+start_pre() {
+	checkpath -d -m 0755 /run/mae-routing
+	checkpath -d -m 0700 /var/lib/mae-routing
+	[ -c /dev/net/tun ] || modprobe tun 2>/dev/null || true
+}
+
+stop_post() {
+	/usr/sbin/mae-routingd --cleanup >/dev/null 2>&1 || true
+}

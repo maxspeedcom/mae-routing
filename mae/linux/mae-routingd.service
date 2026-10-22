@@ -1,0 +1,23 @@
+[Unit]
+Description=MAE Routing node agent
+Documentation=https://routing.maesuaisystem.com/
+Wants=network-pre.target
+After=network-pre.target NetworkManager.service systemd-resolved.service
+
+[Service]
+EnvironmentFile=-/etc/default/mae-routingd
+ExecStart=/usr/sbin/mae-routingd --state=/var/lib/mae-routing/mae-routingd.state --socket=/run/mae-routing/mae-routingd.sock --port=${PORT} $FLAGS
+ExecStopPost=/usr/sbin/mae-routingd --cleanup
+
+Restart=on-failure
+
+RuntimeDirectory=mae-routing
+RuntimeDirectoryMode=0755
+StateDirectory=mae-routing
+StateDirectoryMode=0700
+CacheDirectory=mae-routing
+CacheDirectoryMode=0750
+Type=notify
+
+[Install]
+WantedBy=multi-user.target
