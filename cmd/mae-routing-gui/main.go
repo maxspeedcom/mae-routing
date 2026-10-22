@@ -231,32 +231,32 @@ func (a *app) rebuild(force bool) {
 	switch {
 	case svcErr != nil:
 		systray.SetIcon(iconWarn)
-		systray.SetTooltip(appName + " — ไม่พบบริการ")
-		info(systray.AddMenuItem("ไม่พบบริการ MAE Routing", "บริการ MAERouting ไม่ทำงาน ลองเปิดเครื่องใหม่หรือติดตั้งใหม่"))
+		systray.SetTooltip(appName + " — service not running")
+		info(systray.AddMenuItem("MAE Routing service not running", "The MAERouting service is stopped. Restart the computer or reinstall."))
 		systray.AddSeparator()
 	case state == ipn.Running.String():
 		systray.SetIcon(iconOn)
-		systray.SetTooltip(fmt.Sprintf("%s — เชื่อมต่อแล้ว (%s)", appName, org))
-		info(systray.AddMenuItem("● เชื่อมต่อแล้ว · "+org, ""))
+		systray.SetTooltip(fmt.Sprintf("%s — connected (%s)", appName, org))
+		info(systray.AddMenuItem("● Connected · "+org, ""))
 	case state == ipn.NeedsLogin.String() || state == ipn.NoState.String() || cur.ID == "":
 		systray.SetIcon(iconWarn)
-		systray.SetTooltip(appName + " — ยังไม่ได้เข้าสู่ระบบ")
-		info(systray.AddMenuItem("ยังไม่ได้เข้าสู่ระบบ", ""))
+		systray.SetTooltip(appName + " — not signed in")
+		info(systray.AddMenuItem("Not signed in", ""))
 	case state == ipn.NeedsMachineAuth.String():
 		systray.SetIcon(iconWarn)
-		systray.SetTooltip(appName + " — รอผู้ดูแลอนุมัติเครื่อง")
-		info(systray.AddMenuItem("รอผู้ดูแลอนุมัติเครื่องนี้", ""))
+		systray.SetTooltip(appName + " — waiting for approval")
+		info(systray.AddMenuItem("Waiting for an admin to approve this machine", ""))
 	case state == ipn.Starting.String():
 		systray.SetIcon(iconOff)
-		systray.SetTooltip(appName + " — กำลังเชื่อมต่อ…")
-		info(systray.AddMenuItem("กำลังเชื่อมต่อ… · "+org, ""))
+		systray.SetTooltip(appName + " — connecting…")
+		info(systray.AddMenuItem("Connecting… · "+org, ""))
 	default:
 		systray.SetIcon(iconOff)
-		systray.SetTooltip(fmt.Sprintf("%s — ตัดการเชื่อมต่ออยู่ (%s)", appName, org))
-		info(systray.AddMenuItem("○ ตัดการเชื่อมต่ออยู่ · "+org, ""))
+		systray.SetTooltip(fmt.Sprintf("%s — disconnected (%s)", appName, org))
+		info(systray.AddMenuItem("○ Disconnected · "+org, ""))
 	}
 	if cur.Name != "" && svcErr == nil {
-		info(systray.AddMenuItem("บัญชี: "+cur.Name, ""))
+		info(systray.AddMenuItem("Account: "+cur.Name, ""))
 	}
 	if svcErr != nil {
 		a.addFooter(ctx)
@@ -266,32 +266,32 @@ func (a *app) rebuild(force bool) {
 
 	loggedIn := cur.ID != "" && state != ipn.NeedsLogin.String() && state != ipn.NoState.String()
 	if !loggedIn {
-		onClick(ctx, systray.AddMenuItem("เข้าสู่ระบบ…", "เชื่อมเครื่องนี้เข้ากับเครือข่ายขององค์กร"), a.login)
-		onClick(ctx, systray.AddMenuItem("ยังไม่มีเครือข่าย? สร้างฟรี", ""), func() { webbrowser.Open(signupURL) })
+		onClick(ctx, systray.AddMenuItem("Sign in…", "Connect this machine to your organisation's network"), a.login)
+		onClick(ctx, systray.AddMenuItem("No network yet? Create one free", ""), func() { webbrowser.Open(signupURL) })
 		a.addFooter(ctx)
 		return
 	}
 
 	if prefs != nil && prefs.WantRunning {
-		onClick(ctx, systray.AddMenuItem("ตัดการเชื่อมต่อ", ""), func() { a.setRunning(false) })
+		onClick(ctx, systray.AddMenuItem("Disconnect", ""), func() { a.setRunning(false) })
 	} else {
-		onClick(ctx, systray.AddMenuItem("เชื่อมต่อ", ""), func() { a.setRunning(true) })
+		onClick(ctx, systray.AddMenuItem("Connect", ""), func() { a.setRunning(true) })
 	}
 	systray.AddSeparator()
 
 	// --- this device + peers
 	if st != nil && st.Self != nil && len(st.Self.TailscaleIPs) > 0 {
 		ip := firstIPv4(st.Self.TailscaleIPs)
-		self := systray.AddMenuItem(fmt.Sprintf("เครื่องนี้: %s (%s)", shortName(st.Self), ip), "คลิกเพื่อคัดลอก IP")
+		self := systray.AddMenuItem(fmt.Sprintf("This machine: %s (%s)", shortName(st.Self), ip), "Click to copy the IP address")
 		onClick(ctx, self, func() { copyIP(shortName(st.Self), ip) })
 	}
-	devices := systray.AddMenuItem(fmt.Sprintf("เครื่องในเครือข่าย (%d)", len(peers)), "")
+	devices := systray.AddMenuItem(fmt.Sprintf("Network devices (%d)", len(peers)), "")
 	if len(peers) == 0 {
-		info(devices.AddSubMenuItem("ยังไม่มีเครื่องอื่น", ""))
+		info(devices.AddSubMenuItem("No other machines yet", ""))
 	}
 	for i, p := range peers {
 		if i == maxPeers {
-			more := devices.AddSubMenuItem(fmt.Sprintf("… และอีก %d เครื่อง (ดูในหน้าจัดการ)", len(peers)-maxPeers), "")
+			more := devices.AddSubMenuItem(fmt.Sprintf("… and %d more (see the admin console)", len(peers)-maxPeers), "")
 			onClick(ctx, more, func() { webbrowser.Open(consoleURL) })
 			break
 		}
@@ -300,14 +300,14 @@ func (a *app) rebuild(force bool) {
 			dot = "● "
 		}
 		ip := firstIPv4(p.TailscaleIPs)
-		it := devices.AddSubMenuItem(fmt.Sprintf("%s%s    %s", dot, shortName(p), ip), "คลิกเพื่อคัดลอก IP")
+		it := devices.AddSubMenuItem(fmt.Sprintf("%s%s    %s", dot, shortName(p), ip), "Click to copy the IP address")
 		onClick(ctx, it, func() { copyIP(shortName(p), ip) })
 	}
 
 	// --- exit nodes
-	exit := systray.AddMenuItem("Exit node", "ส่งอินเทอร์เน็ตทั้งหมดออกทางเครื่องอื่นในเครือข่าย")
+	exit := systray.AddMenuItem("Exit node", "Send all internet traffic through another machine in the network")
 	using := prefs != nil && !prefs.ExitNodeID.IsZero()
-	none := exit.AddSubMenuItemCheckbox("ไม่ใช้ exit node", "", !using)
+	none := exit.AddSubMenuItemCheckbox("None", "", !using)
 	onClick(ctx, none, func() { a.setExitNode("") })
 	found := false
 	for _, p := range peers {
@@ -317,53 +317,53 @@ func (a *app) rebuild(force bool) {
 		found = true
 		label := shortName(p)
 		if !p.Online {
-			label += " (ออฟไลน์)"
+			label += " (offline)"
 		}
 		it := exit.AddSubMenuItemCheckbox(label, "", prefs != nil && prefs.ExitNodeID == p.ID)
 		onClick(ctx, it, func() { a.setExitNode(p.ID) })
 	}
 	if !found {
-		info(exit.AddSubMenuItem("ยังไม่มีเครื่องที่เป็น exit node", ""))
+		info(exit.AddSubMenuItem("No exit nodes in this network", ""))
 	}
 	exit.AddSeparator()
-	lan := exit.AddSubMenuItemCheckbox("เข้าถึง LAN ได้ขณะใช้ exit node", "", prefs != nil && prefs.ExitNodeAllowLANAccess)
+	lan := exit.AddSubMenuItemCheckbox("Allow local network access", "", prefs != nil && prefs.ExitNodeAllowLANAccess)
 	onClick(ctx, lan, func() { a.toggle(func(mp *ipn.MaskedPrefs, p *ipn.Prefs) { mp.ExitNodeAllowLANAccess, mp.ExitNodeAllowLANAccessSet = !p.ExitNodeAllowLANAccess, true }) })
 	systray.AddSeparator()
 
 	// --- settings
-	set := systray.AddMenuItem("ตั้งค่า", "")
+	set := systray.AddMenuItem("Settings", "")
 	if prefs != nil {
-		dns := set.AddSubMenuItemCheckbox("ใช้ DNS ของเครือข่าย (MagicDNS)", "", prefs.CorpDNS)
+		dns := set.AddSubMenuItemCheckbox("Use network DNS (MagicDNS)", "", prefs.CorpDNS)
 		onClick(ctx, dns, func() { a.toggle(func(mp *ipn.MaskedPrefs, p *ipn.Prefs) { mp.CorpDNS, mp.CorpDNSSet = !p.CorpDNS, true }) })
-		routes := set.AddSubMenuItemCheckbox("ใช้ subnet routes จากเครือข่าย", "", prefs.RouteAll)
+		routes := set.AddSubMenuItemCheckbox("Use subnet routes", "", prefs.RouteAll)
 		onClick(ctx, routes, func() { a.toggle(func(mp *ipn.MaskedPrefs, p *ipn.Prefs) { mp.RouteAll, mp.RouteAllSet = !p.RouteAll, true }) })
-		shields := set.AddSubMenuItemCheckbox("บล็อกการเชื่อมต่อขาเข้า", "", prefs.ShieldsUp)
+		shields := set.AddSubMenuItemCheckbox("Block incoming connections", "", prefs.ShieldsUp)
 		onClick(ctx, shields, func() { a.toggle(func(mp *ipn.MaskedPrefs, p *ipn.Prefs) { mp.ShieldsUp, mp.ShieldsUpSet = !p.ShieldsUp, true }) })
-		unattended := set.AddSubMenuItemCheckbox("ทำงานต่อแม้ไม่มีใครเข้าสู่ระบบ Windows", "สำหรับเซิร์ฟเวอร์และเครื่องที่ต้องเข้าได้ตลอดเวลา", prefs.ForceDaemon)
+		unattended := set.AddSubMenuItemCheckbox("Run unattended", "Keep running when nobody is signed in to Windows (for servers)", prefs.ForceDaemon)
 		onClick(ctx, unattended, func() { a.toggle(func(mp *ipn.MaskedPrefs, p *ipn.Prefs) { mp.ForceDaemon, mp.ForceDaemonSet = !p.ForceDaemon, true }) })
 	}
 
 	// --- networks (login profiles)
-	nets := systray.AddMenuItem("เครือข่าย: "+org, "")
+	nets := systray.AddMenuItem("Network: "+org, "")
 	for _, pr := range profiles {
 		it := nets.AddSubMenuItemCheckbox(fmt.Sprintf("%s  (%s)", orgOf(pr.ControlURL), pr.Name), "", pr.ID == cur.ID)
 		onClick(ctx, it, func() {
 			if pr.ID != cur.ID {
-				a.do("สลับเครือข่าย", func(c context.Context) error { return a.lc.SwitchProfile(c, pr.ID) })
+				a.do("Switch network", func(c context.Context) error { return a.lc.SwitchProfile(c, pr.ID) })
 			}
 		})
 	}
 	nets.AddSeparator()
-	onClick(ctx, nets.AddSubMenuItem("เข้าสู่ระบบเครือข่ายอื่น…", ""), a.login)
-	onClick(ctx, nets.AddSubMenuItem("ออกจากระบบเครือข่ายนี้", ""), a.logout)
-	onClick(ctx, systray.AddMenuItem("เปิดหน้าจัดการเครือข่าย", consoleURL), func() { webbrowser.Open(consoleURL) })
+	onClick(ctx, nets.AddSubMenuItem("Sign in to another network…", ""), a.login)
+	onClick(ctx, nets.AddSubMenuItem("Sign out of this network", ""), a.logout)
+	onClick(ctx, systray.AddMenuItem("Open admin console", consoleURL), func() { webbrowser.Open(consoleURL) })
 	a.addFooter(ctx)
 }
 
 func (a *app) addFooter(ctx context.Context) {
 	systray.AddSeparator()
-	onClick(ctx, systray.AddMenuItem("เกี่ยวกับ MAE Routing", ""), about)
-	onClick(ctx, systray.AddMenuItem("ปิดโปรแกรม", "ปิดไอคอนนี้ (การเชื่อมต่อยังทำงานต่อ)"), systray.Quit)
+	onClick(ctx, systray.AddMenuItem("About MAE Routing", ""), about)
+	onClick(ctx, systray.AddMenuItem("Exit", "Close this icon (the connection keeps running)"), systray.Quit)
 }
 
 func info(it *systray.MenuItem) { it.Disable() }
@@ -388,27 +388,27 @@ func (a *app) do(what string, fn func(context.Context) error) {
 	defer cancel()
 	if err := fn(ctx); err != nil {
 		log.Printf("%s: %v", what, err)
-		zenity.Error(fmt.Sprintf("%s ไม่สำเร็จ\n\n%v", what, err), zenity.Title(appName))
+		zenity.Error(fmt.Sprintf("%s failed\n\n%v", what, err), zenity.Title(appName))
 	}
 	a.kick()
 }
 
 func (a *app) setRunning(on bool) {
-	a.do("เปลี่ยนการเชื่อมต่อ", func(ctx context.Context) error {
+	a.do("Change connection", func(ctx context.Context) error {
 		_, err := a.lc.EditPrefs(ctx, &ipn.MaskedPrefs{Prefs: ipn.Prefs{WantRunning: on}, WantRunningSet: true})
 		return err
 	})
 }
 
 func (a *app) setExitNode(id tailcfg.StableNodeID) {
-	a.do("ตั้งค่า exit node", func(ctx context.Context) error {
+	a.do("Set exit node", func(ctx context.Context) error {
 		_, err := a.lc.EditPrefs(ctx, &ipn.MaskedPrefs{Prefs: ipn.Prefs{ExitNodeID: id}, ExitNodeIDSet: true})
 		return err
 	})
 }
 
 func (a *app) toggle(set func(mp *ipn.MaskedPrefs, cur *ipn.Prefs)) {
-	a.do("บันทึกการตั้งค่า", func(ctx context.Context) error {
+	a.do("Save settings", func(ctx context.Context) error {
 		cur, err := a.lc.GetPrefs(ctx)
 		if err != nil {
 			return err
@@ -433,8 +433,8 @@ func (a *app) login() {
 	if strings.Contains(last, ".") || last == "login" {
 		last = ""
 	}
-	name, err := zenity.Entry("ชื่อเครือข่ายขององค์กร\n(ส่วนหน้าของ ชื่อ.routing.maesuaisystem.com เช่น maesuai)",
-		zenity.Title("เข้าสู่ระบบ MAE Routing"), zenity.EntryText(last), zenity.OKLabel("ถัดไป"), zenity.CancelLabel("ยกเลิก"))
+	name, err := zenity.Entry("Your network name\n(the first part of name.routing.maesuaisystem.com, e.g. acme)",
+		zenity.Title("Sign in to MAE Routing"), zenity.EntryText(last), zenity.OKLabel("Next"), zenity.CancelLabel("Cancel"))
 	if err != nil {
 		return // cancelled
 	}
@@ -442,11 +442,11 @@ func (a *app) login() {
 	name = strings.TrimSuffix(strings.TrimPrefix(strings.TrimPrefix(name, "https://"), "http://"), "/")
 	name = strings.TrimSuffix(name, "."+zone)
 	if !slugRE.MatchString(name) {
-		zenity.Error("ชื่อเครือข่ายไม่ถูกต้อง ใช้ a-z, 0-9 และ - ยาว 3–32 ตัว", zenity.Title(appName))
+		zenity.Error("Invalid network name. Use a-z, 0-9 and -, 3–32 characters.", zenity.Title(appName))
 		return
 	}
 	controlURL := "https://" + name + "." + zone
-	a.do("เข้าสู่ระบบ", func(ctx context.Context) error {
+	a.do("Sign in", func(ctx context.Context) error {
 		if loggedIn {
 			// like `tailscale login`: keep the current network as its own profile and add a new one
 			if err := a.lc.SwitchToEmptyProfile(ctx); err != nil {
@@ -466,11 +466,11 @@ func (a *app) login() {
 }
 
 func (a *app) logout() {
-	if zenity.Question("ออกจากระบบเครือข่ายนี้?\nเครื่องนี้จะหลุดจากเครือข่ายจนกว่าจะเข้าสู่ระบบใหม่",
-		zenity.Title(appName), zenity.OKLabel("ออกจากระบบ"), zenity.CancelLabel("ยกเลิก")) != nil {
+	if zenity.Question("Sign out of this network?\nThis machine will leave the network until you sign in again.",
+		zenity.Title(appName), zenity.OKLabel("Sign out"), zenity.CancelLabel("Cancel")) != nil {
 		return
 	}
-	a.do("ออกจากระบบ", func(ctx context.Context) error { return a.lc.Logout(ctx) })
+	a.do("Sign out", func(ctx context.Context) error { return a.lc.Logout(ctx) })
 }
 
 func copyIP(name, ip string) {
@@ -481,12 +481,12 @@ func copyIP(name, ip string) {
 		log.Printf("clipboard: %v", err)
 		return
 	}
-	zenity.Notify(fmt.Sprintf("คัดลอก IP ของ %s แล้ว: %s", name, ip), zenity.Title(appName))
+	zenity.Notify(fmt.Sprintf("Copied the IP address of %s: %s", name, ip), zenity.Title(appName))
 }
 
 func about() {
-	zenity.Info(fmt.Sprintf("%s %s\n\nเครือข่ายส่วนตัวสำหรับองค์กร\nhttps://%s\n\nสัญญาอนุญาตของส่วนประกอบโอเพนซอร์ส: THIRD-PARTY-NOTICES.txt ในโฟลเดอร์โปรแกรม",
-		appName, version.Short(), zone), zenity.Title("เกี่ยวกับ "+appName))
+	zenity.Info(fmt.Sprintf("%s %s\n\nPrivate networks for organisations\nhttps://%s\n\nOpen source licences: THIRD-PARTY-NOTICES.txt in the program folder",
+		appName, version.Short(), zone), zenity.Title("About "+appName))
 }
 
 // ---------- IPN bus ----------
@@ -519,7 +519,7 @@ func (a *app) watchOnce() error {
 			}
 		}
 		if n.LoginFinished != nil {
-			zenity.Notify("เข้าสู่ระบบเรียบร้อย เครื่องนี้เชื่อมกับเครือข่ายแล้ว", zenity.Title(appName))
+			zenity.Notify("Signed in. This machine is now on the network.", zenity.Title(appName))
 		}
 		if n.State != nil || n.Prefs != nil || n.LoginFinished != nil {
 			a.kick()

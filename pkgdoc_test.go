@@ -39,7 +39,7 @@ func TestPackageDocs(t *testing.T) {
 			return err
 		}
 		if fi.Mode().IsDir() && path != "." && strings.HasPrefix(filepath.Base(path), ".") {
-			return filepath.SkipDir // No documentation lives in dot directories (.git, .claude, etc)
+			return filepath.SkipDir // No documentation lives in dot directories (.git and the like)
 		}
 		if fi.Mode().IsDir() && filepath.Base(path) == "testdata" {
 			return filepath.SkipDir // testdata is ignored by the go tool; not real packages

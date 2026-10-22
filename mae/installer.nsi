@@ -37,27 +37,26 @@ VIAddVersionKey /LANG=0 "LegalCopyright" "© 2026 MAE Routing"
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP "${ASSETS}\wizard.bmp"
 !define MUI_ABORTWARNING
 
-!define MUI_WELCOMEPAGE_TITLE "ติดตั้ง MAE Routing"
-!define MUI_WELCOMEPAGE_TEXT "MAE Routing เชื่อมคอมพิวเตอร์เครื่องนี้เข้ากับเครือข่ายส่วนตัวขององค์กรคุณ เข้ารหัสด้วย WireGuard ใช้ได้จากทุกที่$\r$\n$\r$\nหลังติดตั้ง ไอคอน MAE Routing จะอยู่ที่มุมขวาล่างของหน้าจอ คลิกแล้วเลือก “เข้าสู่ระบบ…” และใส่ชื่อเครือข่ายขององค์กร$\r$\n$\r$\nยังไม่มีเครือข่าย? สร้างฟรีที่ routing.maesuaisystem.com"
+!define MUI_WELCOMEPAGE_TITLE "Install MAE Routing"
+!define MUI_WELCOMEPAGE_TEXT "MAE Routing connects this computer to your organisation's private network, encrypted with WireGuard, from anywhere.$\r$\n$\r$\nAfter installing, the MAE Routing icon appears in the bottom-right corner of the screen. Click it, choose “Sign in…” and enter your network name.$\r$\n$\r$\nNo network yet? Create one free at routing.maesuaisystem.com"
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
-!define MUI_FINISHPAGE_TITLE "ติดตั้ง MAE Routing เรียบร้อย"
-!define MUI_FINISHPAGE_TEXT "คลิกไอคอน MAE Routing ที่มุมขวาล่างของหน้าจอ แล้วเลือก “เข้าสู่ระบบ…” เพื่อเชื่อมต่อเครือข่ายขององค์กร"
+!define MUI_FINISHPAGE_TITLE "MAE Routing is installed"
+!define MUI_FINISHPAGE_TEXT "Click the MAE Routing icon in the bottom-right corner of the screen and choose “Sign in…” to join your network."
 !define MUI_FINISHPAGE_RUN
-!define MUI_FINISHPAGE_RUN_TEXT "เปิด MAE Routing ตอนนี้"
+!define MUI_FINISHPAGE_RUN_TEXT "Start MAE Routing now"
 !define MUI_FINISHPAGE_RUN_FUNCTION LaunchTray
 !insertmacro MUI_PAGE_FINISH
 
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
 
-!insertmacro MUI_LANGUAGE "Thai"
 !insertmacro MUI_LANGUAGE "English"
 
 Function .onInit
   ${IfNot} ${RunningX64}
-    MessageBox MB_ICONSTOP "MAE Routing รองรับ Windows 64 บิต (x64) เท่านั้น"
+    MessageBox MB_ICONSTOP "MAE Routing needs 64-bit Windows (x64)."
     Abort
   ${EndIf}
   SetRegView 64
@@ -93,11 +92,11 @@ Section "MAE Routing" SecMain
   Pop $0
   Pop $1
   ${If} $0 != 0
-    DetailPrint "กำลังติดตั้งบริการ MAE Routing…"
+    DetailPrint "Installing the MAE Routing service…"
     nsExec::ExecToLog '"$INSTDIR\maeroutingd.exe" install-system-daemon'
     Pop $0
     ${If} $0 != 0
-      MessageBox MB_ICONSTOP "ติดตั้งบริการ MAE Routing ไม่สำเร็จ (รหัส $0)"
+      MessageBox MB_ICONSTOP "Could not install the MAE Routing service (code $0)."
       Abort
     ${EndIf}
   ${EndIf}
