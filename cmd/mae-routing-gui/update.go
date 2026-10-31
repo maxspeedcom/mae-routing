@@ -5,7 +5,8 @@
 package main
 
 // Self-update. The app asks the website which Windows build is newest (the same /api/versions the download page
-// uses). When there is a newer one it says so once and adds "Update to <version>…" to the menu. Choosing it asks
+// uses), a minute after start and then every hour. When there is a newer one it says so once, adds
+// "Update to <version>…" to the menu and mentions it in the icon's tooltip. Choosing it asks
 // first, then downloads the installer, checks its SHA-256 against the website, and runs it silently with
 // administrator rights (one Windows permission prompt). The installer stops this app and the service, replaces
 // the files and starts both again, so the user does not have to download anything by hand.
@@ -34,7 +35,7 @@ import (
 
 const (
 	versionsURL  = "https://" + zone + "/api/versions"
-	updateEvery  = 6 * time.Hour
+	updateEvery  = time.Hour   // a new build is noticed within an hour
 	firstCheckIn = time.Minute
 )
 

@@ -234,31 +234,37 @@ func (a *app) rebuild(force bool) {
 	}
 
 	// --- status + tray icon
+	setTip := func(t string) { // the tooltip also says when an update is waiting
+		if upd != nil {
+			t += " · update " + upd.Version + " available"
+		}
+		systray.SetTooltip(t)
+	}
 	switch {
 	case svcErr != nil:
 		systray.SetIcon(iconWarn)
-		systray.SetTooltip(appName + " — service not running")
+		setTip(appName + " — service not running")
 		info(systray.AddMenuItem("MAE Routing service not running", "The MAERouting service is stopped. Restart the computer or reinstall."))
 		systray.AddSeparator()
 	case state == ipn.Running.String():
 		systray.SetIcon(iconOn)
-		systray.SetTooltip(fmt.Sprintf("%s %s — connected (%s)", appName, shownVersion(), org))
+		setTip(fmt.Sprintf("%s %s — connected (%s)", appName, shownVersion(), org))
 		info(systray.AddMenuItem("● Connected · "+org, ""))
 	case state == ipn.NeedsLogin.String() || state == ipn.NoState.String() || cur.ID == "":
 		systray.SetIcon(iconWarn)
-		systray.SetTooltip(appName + " — not signed in")
+		setTip(appName + " — not signed in")
 		info(systray.AddMenuItem("Not signed in", ""))
 	case state == ipn.NeedsMachineAuth.String():
 		systray.SetIcon(iconWarn)
-		systray.SetTooltip(appName + " — waiting for approval")
+		setTip(appName + " — waiting for approval")
 		info(systray.AddMenuItem("Waiting for an admin to approve this machine", ""))
 	case state == ipn.Starting.String():
 		systray.SetIcon(iconOff)
-		systray.SetTooltip(appName + " — connecting…")
+		setTip(appName + " — connecting…")
 		info(systray.AddMenuItem("Connecting… · "+org, ""))
 	default:
 		systray.SetIcon(iconOff)
-		systray.SetTooltip(fmt.Sprintf("%s — disconnected (%s)", appName, org))
+		setTip(fmt.Sprintf("%s — disconnected (%s)", appName, org))
 		info(systray.AddMenuItem("○ Disconnected · "+org, ""))
 	}
 	if cur.Name != "" && svcErr == nil {
