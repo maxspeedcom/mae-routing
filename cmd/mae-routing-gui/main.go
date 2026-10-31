@@ -67,6 +67,8 @@ type app struct {
 	profiles  []ipn.LoginProfile
 	svcErr    error
 	signature string // what the menu currently shows; rebuild only when it changes
+	update    *release // newer Windows build on the website, if any (update.go)
+	updating  bool
 
 	rebuildCh  chan struct{}
 	menuCancel context.CancelFunc
@@ -106,6 +108,7 @@ func (a *app) onReady() {
 	systray.SetIcon(iconOff)
 	systray.SetTooltip(appName)
 	go a.watchIPNBus()
+	go a.checkUpdates()
 	go func() {
 		t := time.NewTicker(15 * time.Second) // peers come and go without a state change
 		defer t.Stop()
@@ -174,7 +177,7 @@ func shortName(p *ipnstate.PeerStatus) string {
 // rebuild redraws the whole menu (fyne systray cannot remove separators), but only when its content changed.
 func (a *app) rebuild(force bool) {
 	a.mu.Lock()
-	st, prefs, cur, profiles, svcErr := a.status, a.prefs, a.cur, a.profiles, a.svcErr
+	st, prefs, cur, profiles, svcErr, upd := a.status, a.prefs, a.cur, a.profiles, a.svcErr, a.update
 	a.mu.Unlock()
 
 	state := ""
@@ -197,7 +200,10 @@ func (a *app) rebuild(force bool) {
 		return strings.Compare(shortName(x), shortName(y))
 	})
 
-	sig := fmt.Sprint(state, svcErr != nil, cur.ID, len(profiles))
+	sig := fmt.Sprint(state, svcErr != nil, cur.ID, len(profiles), upd != nil)
+	if upd != nil {
+		sig += upd.Version
+	}
 	if prefs != nil {
 		sig += fmt.Sprint(prefs.WantRunning, prefs.CorpDNS, prefs.RouteAll, prefs.ShieldsUp, prefs.ForceDaemon,
 			prefs.ExitNodeID, prefs.ExitNodeAllowLANAccess)
@@ -257,6 +263,9 @@ func (a *app) rebuild(force bool) {
 	}
 	if cur.Name != "" && svcErr == nil {
 		info(systray.AddMenuItem("Account: "+cur.Name, ""))
+	}
+	if upd != nil {
+		onClick(ctx, systray.AddMenuItem("Update to "+upd.Version+"…", "Download and install the new version"), func() { go a.installUpdate() })
 	}
 	if svcErr != nil {
 		a.addFooter(ctx)
