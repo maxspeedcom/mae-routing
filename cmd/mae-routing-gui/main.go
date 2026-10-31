@@ -264,9 +264,6 @@ func (a *app) rebuild(force bool) {
 	if cur.Name != "" && svcErr == nil {
 		info(systray.AddMenuItem("Account: "+cur.Name, ""))
 	}
-	if upd != nil {
-		onClick(ctx, systray.AddMenuItem("Update to "+upd.Version+"…", "Download and install the new version"), func() { go a.installUpdate() })
-	}
 	if svcErr != nil {
 		a.addFooter(ctx)
 		return
@@ -371,6 +368,16 @@ func (a *app) rebuild(force bool) {
 
 func (a *app) addFooter(ctx context.Context) {
 	systray.AddSeparator()
+	// always show which version runs, and a way to update: "Update to …" when the website has a newer build
+	info(systray.AddMenuItem("Version "+shownVersion(), ""))
+	a.mu.Lock()
+	upd := a.update
+	a.mu.Unlock()
+	if upd != nil {
+		onClick(ctx, systray.AddMenuItem("Update to "+upd.Version+"…", "Download and install the new version"), func() { go a.installUpdate() })
+	} else {
+		onClick(ctx, systray.AddMenuItem("Check for updates", "Look for a newer version now"), func() { go a.checkNow() })
+	}
 	onClick(ctx, systray.AddMenuItem("About MAE Routing", ""), about)
 	onClick(ctx, systray.AddMenuItem("Exit", "Close this icon (the connection keeps running)"), systray.Quit)
 }

@@ -150,6 +150,29 @@ func (a *app) checkUpdates() {
 	}
 }
 
+// checkNow is the "Check for updates" menu item.
+func (a *app) checkNow() {
+	r, err := fetchLatest(a.ctx)
+	if err != nil {
+		zenity.Error(fmt.Sprintf("Could not check for updates: %v\n\nCheck the internet connection and try again.", err), zenity.Title(appName))
+		return
+	}
+	a.mu.Lock()
+	if r.newerThanUs() {
+		a.update = &r
+	} else {
+		a.update = nil
+	}
+	has := a.update != nil
+	a.mu.Unlock()
+	a.kick()
+	if has {
+		a.installUpdate()
+		return
+	}
+	zenity.Info(fmt.Sprintf("You have the latest version of MAE Routing (%s).", shownVersion()), zenity.Title(appName))
+}
+
 // installUpdate is the "Update to …" menu item.
 func (a *app) installUpdate() {
 	a.mu.Lock()
