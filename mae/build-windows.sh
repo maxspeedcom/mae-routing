@@ -2,7 +2,7 @@
 # Build the MAE Routing Windows client (amd64) from the branded tailscale fork, then the NSIS installer.
 #   mae/build-windows.sh [build-number]
 # Output: mae/out/win/{maeroutingd.exe,mae-routing.exe,MAERouting.exe,wintun.dll}
-#         mae/out/MAERouting-<version>-<build>-setup.exe
+#         mae/out/MAERouting-<version>-<build>-setup.exe (mae/make-installer.sh)
 set -euo pipefail
 HERE=$(cd "$(dirname "$0")" && pwd)
 SRC=$(cd "$HERE/.." && pwd)
@@ -51,8 +51,7 @@ cp "$SRC/LICENSE" "$OUT/THIRD-PARTY-NOTICES.txt"
 unzip -o -q -j "$HERE/out/wintun-$WVER.zip" "wintun/LICENSE.txt" -d "$HERE/out" && mv "$HERE/out/LICENSE.txt" "$OUT/LICENSE-wintun.txt"
 ls -la "$OUT"
 
-if command -v makensis >/dev/null; then
-  makensis -V2 -DVERSION="$UPSTREAM" -DBUILD="$BUILD" -DSRCDIR="$OUT" -DASSETS="$HERE/out" \
-    -DOUTFILE="$HERE/out/MAERouting-$UPSTREAM-$BUILD-setup.exe" "$HERE/installer.nsi"
-  sha256sum "$HERE/out/MAERouting-$UPSTREAM-$BUILD-setup.exe"
+# the installer is a separate step so CI can sign the programs first (MAE_NO_INSTALLER=1, see mae-windows.yml)
+if [ -z "${MAE_NO_INSTALLER:-}" ] && command -v makensis >/dev/null; then
+  bash "$HERE/make-installer.sh" "$BUILD"
 fi

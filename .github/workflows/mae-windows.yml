@@ -1,0 +1,114 @@
+# Builds the MAE Routing Windows client (64-bit programs and the installer) from this repository on GitHub Actions,
+# so every Windows release can be traced to public source and a public build log.
+#
+# Signing (SignPath Foundation, see the "Code signing policy" in README.md): when the repository variable
+# SIGNPATH_ORGANIZATION_ID and the secret SIGNPATH_API_TOKEN exist, the three programs are signed first, then
+# wrapped into the installer, and the installer is signed too. Every signing request waits for manual approval
+# in SignPath. Without them the build runs unsigned (as before SignPath approved the project).
+#
+# Release: push a tag mae-win-v<version>-<build> (e.g. mae-win-v1.104.2-8). Test build: run the workflow by hand.
+name: mae-windows
+on:
+  workflow_dispatch:
+    inputs:
+      build:
+        description: MAE build number (e.g. 8)
+        required: true
+  push:
+    tags: ["mae-win-v*"]
+permissions:
+  contents: write   # create the GitHub release on a tag
+  actions: read
+env:
+  SIGN: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
+jobs:
+  windows:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Tools (NSIS, Pillow, go-winres)
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q nsis
+          pip install --quiet pillow
+          go install github.com/tc-hib/go-winres@v0.3.3
+      - name: Version
+        run: |
+          B="${{ inputs.build }}"
+          [ -n "$B" ] || B="${GITHUB_REF_NAME##*-}"     # tag mae-win-v1.104.2-8 -> 8
+          case "$B" in ''|*[!0-9]*) echo "bad build number: $B"; exit 1;; esac
+          echo "BUILD=$B" >> "$GITHUB_ENV"
+          echo "VERSION=$(cat VERSION.txt)-$B" >> "$GITHUB_ENV"
+      - name: Icons and installer pictures
+        run: python3 mae/make-assets.py .
+      - name: Build the programs
+        run: MAE_NO_INSTALLER=1 GOWINRES="$(go env GOPATH)/bin/go-winres" bash mae/build-windows.sh "$BUILD"
+
+      - name: Upload the programs for signing
+        if: env.SIGN == 'true'
+        id: programs
+        uses: actions/upload-artifact@v4
+        with:
+          name: programs-${{ env.VERSION }}
+          path: |
+            mae/out/win/MAERouting.exe
+            mae/out/win/maeroutingd.exe
+            mae/out/win/mae-routing.exe
+      - name: Sign the programs (SignPath Foundation)
+        if: env.SIGN == 'true'
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: mae-routing
+          signing-policy-slug: release-signing
+          artifact-configuration-slug: programs
+          github-artifact-id: ${{ steps.programs.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: mae/out/win
+
+      - name: Build the installer
+        run: bash mae/make-installer.sh "$BUILD"
+
+      - name: Upload the installer for signing
+        if: env.SIGN == 'true'
+        id: installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: installer-unsigned-${{ env.VERSION }}
+          path: mae/out/MAERouting-${{ env.VERSION }}-setup.exe
+      - name: Sign the installer (SignPath Foundation)
+        if: env.SIGN == 'true'
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: mae-routing
+          signing-policy-slug: release-signing
+          artifact-configuration-slug: installer
+          github-artifact-id: ${{ steps.installer.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: mae/out/signed
+      - name: Use the signed installer
+        if: env.SIGN == 'true'
+        run: cp mae/out/signed/MAERouting-$VERSION-setup.exe mae/out/
+
+      - name: Checksum
+        run: cd mae/out && sha256sum MAERouting-$VERSION-setup.exe | tee MAERouting-$VERSION-setup.exe.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MAERouting-${{ env.VERSION }}-setup
+          path: |
+            mae/out/MAERouting-${{ env.VERSION }}-setup.exe
+            mae/out/MAERouting-${{ env.VERSION }}-setup.exe.sha256
+      - name: GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" --title "MAE Routing $VERSION for Windows" \
+            --notes "Windows 10/11 64-bit. Built by GitHub Actions run ${{ github.run_id }}. Install: irm https://routing.maesuaisystem.com/install.ps1 | iex" \
+            mae/out/MAERouting-$VERSION-setup.exe mae/out/MAERouting-$VERSION-setup.exe.sha256
