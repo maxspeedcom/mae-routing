@@ -8,11 +8,8 @@ Licence: BSD-3-Clause, see `LICENSE`.
 
 ## Install
 
-Windows 10/11 (64-bit), in PowerShell:
-
-    irm https://routing.maesuaisystem.com/install.ps1 | iex
-
-or download the installer: https://routing.maesuaisystem.com/download/MAERouting-setup-latest.exe
+Windows 10/11 (64-bit): https://routing.maesuaisystem.com/download/MAERouting-setup-latest.exe
+(after that the app updates itself)
 
 Linux (x86_64, arm64, armv7, i386; systemd or OpenRC):
 
@@ -39,7 +36,6 @@ Step-by-step guide: https://routing.maesuaisystem.com/install
 | `cmd/mae-routing-gui` | Windows tray app `MAERouting.exe` |
 | `mae/build-windows.sh`, `mae/make-installer.sh` | Windows service, CLI, tray app, then the NSIS installer |
 | `.github/workflows/mae-windows.yml` | Windows release build on GitHub Actions, signed through SignPath |
-| `mae/windows/install.ps1` | one-line Windows installer (checks the SHA-256 of the download) |
 | `mae/build-linux.sh` | `mae-routing` + `mae-routingd`: .tgz, .deb, .rpm, `install.sh` |
 | `mae/docker/`, `.github/workflows/mae-docker.yml` | container image for amd64, arm64, armv7 |
 
