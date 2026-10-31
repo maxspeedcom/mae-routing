@@ -19,6 +19,21 @@ mkdir -p "$OUT"
 cd "$SRC"
 python3 "$HERE/apply-branding.py" "$SRC" >/dev/null
 echo "building $VERSION"
+# this build's version in the Windows file properties (Explorer > Properties > Details) of all three programs;
+# FileVersion must be 4 numbers (1.104.2.7), ProductVersion is shown as on the download page (1.104.2-7)
+for d in cmd/tailscaled cmd/tailscale cmd/mae-routing-gui; do
+  python3 - "$d/winres/winres.json" "$UPSTREAM" "$BUILD" <<'PY'
+import json, sys
+path, upstream, build = sys.argv[1:4]
+data = json.load(open(path, encoding='utf-8'))
+for res in data['RT_VERSION']['#1'].values():
+    res['fixed'].update(file_version=f'{upstream}.{build}', product_version=f'{upstream}.{build}')
+    for info in res['info'].values():
+        info.update(FileVersion=f'{upstream}.{build}', ProductVersion=f'{upstream}-{build}')
+json.dump(data, open(path, 'w', encoding='utf-8'), indent=2, ensure_ascii=False)
+PY
+  (cd "$d" && GOOS= GOARCH= "${GOWINRES:-$HOME/go/bin/go-winres}" make --in winres/winres.json --arch amd64 --out rsrc)
+done
 go build -trimpath -tags "$TAGS" -ldflags "$LDFLAGS" -o "$OUT/maeroutingd.exe" ./cmd/tailscaled
 go build -trimpath -tags "$TAGS" -ldflags "$LDFLAGS" -o "$OUT/mae-routing.exe" ./cmd/tailscale
 go build -trimpath -tags "$TAGS" -ldflags "$LDFLAGS -H windowsgui" -o "$OUT/MAERouting.exe" ./cmd/mae-routing-gui

@@ -19,7 +19,7 @@ GREY = (122, 127, 153, 255)
 AMBER = (245, 158, 11, 255)
 MINT = (255, 224, 138, 255)      # accent node #FFE08A
 WHITE = (255, 255, 255, 255)
-VERSION = '1.104.2.1'          # file version shown in Explorer (upstream 1.104.2, MAE build 1)
+VERSION = '1.104.2.1'          # placeholder: build-windows.sh stamps each build's own version before compiling
 HERE = pathlib.Path(__file__).resolve().parent
 
 

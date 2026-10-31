@@ -20,18 +20,18 @@
     "#1": {
       "0000": {
         "fixed": {
-          "file_version": "1.104.2.1",
-          "product_version": "1.104.2.1"
+          "file_version": "1.104.2.7",
+          "product_version": "1.104.2.7"
         },
         "info": {
           "0409": {
             "CompanyName": "MAE Routing (maesuaisystem.com)",
             "FileDescription": "MAE Routing",
-            "FileVersion": "1.104.2.1",
+            "FileVersion": "1.104.2.7",
             "InternalName": "MAERouting",
             "OriginalFilename": "MAERouting.exe",
             "ProductName": "MAE Routing",
-            "ProductVersion": "1.104.2.1",
+            "ProductVersion": "1.104.2-7",
             "LegalCopyright": "© 2026 MAE Routing"
           }
         }

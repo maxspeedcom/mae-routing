@@ -21,7 +21,7 @@ VIAddVersionKey /LANG=0 "ProductName" "${APP}"
 VIAddVersionKey /LANG=0 "FileDescription" "MAE Routing Setup"
 VIAddVersionKey /LANG=0 "CompanyName" "MAE Routing (maesuaisystem.com)"
 VIAddVersionKey /LANG=0 "FileVersion" "${VERSION}.${BUILD}"
-VIAddVersionKey /LANG=0 "ProductVersion" "${VERSION}.${BUILD}"
+VIAddVersionKey /LANG=0 "ProductVersion" "${VERSION}-${BUILD}"
 VIAddVersionKey /LANG=0 "LegalCopyright" "© 2026 MAE Routing"
 
 !include "MUI2.nsh"

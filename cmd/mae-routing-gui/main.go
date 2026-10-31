@@ -236,7 +236,7 @@ func (a *app) rebuild(force bool) {
 		systray.AddSeparator()
 	case state == ipn.Running.String():
 		systray.SetIcon(iconOn)
-		systray.SetTooltip(fmt.Sprintf("%s — connected (%s)", appName, org))
+		systray.SetTooltip(fmt.Sprintf("%s %s — connected (%s)", appName, shownVersion(), org))
 		info(systray.AddMenuItem("● Connected · "+org, ""))
 	case state == ipn.NeedsLogin.String() || state == ipn.NoState.String() || cur.ID == "":
 		systray.SetIcon(iconWarn)
@@ -484,9 +484,14 @@ func copyIP(name, ip string) {
 	zenity.Notify(fmt.Sprintf("Copied the IP address of %s: %s", name, ip), zenity.Title(appName))
 }
 
+// shownVersion is the version as the download page and admin console show it: "1.104.2-7" (build 7).
+func shownVersion() string {
+	return strings.Replace(version.Long(), "-mae", "-", 1)
+}
+
 func about() {
-	zenity.Info(fmt.Sprintf("%s %s\n\nPrivate networks for organisations\nhttps://%s\n\nOpen source licences: THIRD-PARTY-NOTICES.txt in the program folder",
-		appName, version.Short(), zone), zenity.Title("About "+appName))
+	zenity.Info(fmt.Sprintf("%s\nVersion %s\n\nPrivate networks for organisations\nhttps://%s\n\nOpen source licences: THIRD-PARTY-NOTICES.txt in the program folder",
+		appName, shownVersion(), zone), zenity.Title("About "+appName))
 }
 
 // ---------- IPN bus ----------
