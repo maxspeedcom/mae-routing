@@ -35,23 +35,22 @@ Step-by-step guide: https://routing.maesuaisystem.com/install
 | `mae/apply-branding.py` | all MAE Routing source edits (idempotent) |
 | `cmd/mae-routing-gui` | Windows tray app `MAERouting.exe` |
 | `mae/build-windows.sh`, `mae/make-installer.sh` | Windows service, CLI, tray app, then the NSIS installer |
-| `.github/workflows/mae-windows.yml` | Windows release build on GitHub Actions, signed through SignPath |
+| `.github/workflows/mae-windows.yml` | Windows release build on GitHub Actions (signing steps run only when configured) |
 | `mae/build-linux.sh` | `mae-routing` + `mae-routingd`: .tgz, .deb, .rpm, `install.sh` |
 | `mae/docker/`, `.github/workflows/mae-docker.yml` | container image for amd64, arm64, armv7 |
 
 ## Code signing policy
 
-Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by
-[SignPath Foundation](https://signpath.org/).
+The Windows releases are not code-signed yet, so Windows SmartScreen warns the first time the installer runs.
+After that the app updates itself and checks every update against the SHA-256 published on the website.
 
-- Signed files: the Windows programs `MAERouting.exe`, `maeroutingd.exe`, `mae-routing.exe` and the installer
-  `MAERouting-<version>-setup.exe`, built from this repository by `.github/workflows/mae-windows.yml`.
+- The Windows programs `MAERouting.exe`, `maeroutingd.exe`, `mae-routing.exe` and the installer
+  `MAERouting-<version>-setup.exe` are built from this repository by `.github/workflows/mae-windows.yml`;
+  each GitHub release has the installer and its SHA-256.
   `wintun.dll` is shipped exactly as released and signed by WireGuard LLC.
-- Signing starts with the first Windows release built after SignPath Foundation approves the project;
-  earlier builds (up to 1.104.2-7) are not signed.
 - Committers, reviewers and approvers: [@maxspeedcom](https://github.com/maxspeedcom) (Maesuai System).
-  Changes from outside the team are reviewed before they are merged, every release is approved by hand before it is
-  signed, and team members use multi-factor authentication for GitHub and SignPath.
+  Changes from outside the team are reviewed before they are merged, and every release is approved by hand before it
+  is published.
 - Details: https://routing.maesuaisystem.com/code-signing
 
 ## Privacy

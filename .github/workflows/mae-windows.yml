@@ -1,10 +1,10 @@
 # Builds the MAE Routing Windows client (64-bit programs and the installer) from this repository on GitHub Actions,
 # so every Windows release can be traced to public source and a public build log.
 #
-# Signing (SignPath Foundation, see the "Code signing policy" in README.md): when the repository variable
+# Signing (SignPath, see the "Code signing policy" in README.md): only when the repository variable
 # SIGNPATH_ORGANIZATION_ID and the secret SIGNPATH_API_TOKEN exist, the three programs are signed first, then
 # wrapped into the installer, and the installer is signed too. Every signing request waits for manual approval
-# in SignPath. Without them the build runs unsigned (as before SignPath approved the project).
+# in SignPath. Without them (the case today) the build runs unsigned.
 #
 # Release: push a tag mae-win-v<version>-<build> (e.g. mae-win-v1.104.2-8). Test build: run the workflow by hand.
 name: mae-windows
@@ -57,7 +57,7 @@ jobs:
             mae/out/win/MAERouting.exe
             mae/out/win/maeroutingd.exe
             mae/out/win/mae-routing.exe
-      - name: Sign the programs (SignPath Foundation)
+      - name: Sign the programs (SignPath)
         if: env.SIGN == 'true'
         uses: signpath/github-action-submit-signing-request@v1
         with:
@@ -80,7 +80,7 @@ jobs:
         with:
           name: installer-unsigned-${{ env.VERSION }}
           path: mae/out/MAERouting-${{ env.VERSION }}-setup.exe
-      - name: Sign the installer (SignPath Foundation)
+      - name: Sign the installer (SignPath)
         if: env.SIGN == 'true'
         uses: signpath/github-action-submit-signing-request@v1
         with:
